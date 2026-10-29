@@ -431,8 +431,60 @@ body:has(#ab-space-hero) .recent-post-item .post_cover img { transition: transfo
     body:has(#ab-space-hero) { background-attachment: scroll; }
 }
 
+/* ---------- Pointer / 桌面鼠标光晕与短暂星尘 ---------- */
+#ab-pointer-light {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    overflow: clip;
+    pointer-events: none;
+    user-select: none;
+    contain: strict;
+    opacity: 0;
+    mix-blend-mode: screen;
+}
+#ab-pointer-light.ab-pointer-visible { opacity: 1; }
+#ab-pointer-light * { pointer-events: none !important; }
+.ab-pointer-halo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 240px;
+    height: 240px;
+    margin: -120px 0 0 -120px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(208, 179, 255, .32), rgba(137, 146, 255, .18) 22%, rgba(137, 100, 217, .07) 46%, transparent 70%);
+    will-change: transform;
+}
+.ab-pointer-halo::before {
+    content: "";
+    position: absolute;
+    left: 50%;top: 50%;
+    width: 24px;height: 24px;
+    transform: translate(-50%, -50%);
+    border: 1px solid rgba(218, 202, 255, .5);
+    border-radius: 50%;
+    box-shadow: 0 0 18px rgba(170, 141, 245, .3);
+}
+.ab-pointer-spark {
+    position: absolute;
+    top: -5px;left: -5px;
+    color: #decaff;
+    text-shadow: 0 0 8px #b198ef;
+    font: 10px/1 sans-serif;
+    opacity: 0;
+}
+[data-theme="light"] #ab-pointer-light { mix-blend-mode: multiply; }
+[data-theme="light"] .ab-pointer-halo { background: radial-gradient(circle, rgba(136, 102, 196, .18), rgba(116, 132, 205, .09) 30%, transparent 68%); }
+[data-theme="light"] .ab-pointer-halo::before { border-color: rgba(105, 70, 164, .5); }
+[data-theme="light"] .ab-pointer-spark { color: #7856b0; text-shadow: none; }
+@media (hover: none), (pointer: coarse) {
+    #ab-pointer-light { display: none !important; }
+}
+
 /* ---------- Motion：尊重减弱动效偏好 ---------- */
 @media (prefers-reduced-motion: reduce) {
+    #ab-pointer-light { display: none !important; }
     .ab-stars-depth-0, .ab-stars-depth-1, .ab-shooting-star { animation: none !important; }
     #ab-space-hero *, body:has(#ab-space-hero) .post_cover img { transition: none !important; }
     #ab-space-hero::before { background: none; }

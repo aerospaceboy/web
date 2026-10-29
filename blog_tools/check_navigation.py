@@ -3,6 +3,7 @@
 import json
 from pathlib import Path
 import tempfile
+import time
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from threading import Thread
@@ -48,16 +49,19 @@ def main():
         worker.start()
         try:
             run_browser_checks(server.server_port)
+            run_pointer_checks(server.server_port)
         finally:
             server.shutdown()
             server.server_close()
             worker.join()
-    print(json.dumps({"ok": True, "scenarios": ["flat_and_mixed_menu", "repeat_pjax", "menu_update", "native_menu_recovery", "theme_toggle", "disabled_widgets", "native_loading_preserved", "privacy_link", "copy_success", "copy_denied", "visible_cover_priority", "cover_fallback", "space_hero_pjax", "space_hero_page_exit", "space_hero_reduced_motion", "space_hero_light_mode", "nebula_image_fallback", "light_profile_contrast"]}))
+    print(json.dumps({"ok": True, "scenarios": ["flat_and_mixed_menu", "repeat_pjax", "menu_update", "native_menu_recovery", "theme_toggle", "disabled_widgets", "native_loading_preserved", "privacy_link", "copy_success", "copy_denied", "visible_cover_priority", "cover_fallback", "space_hero_pjax", "space_hero_page_exit", "space_hero_reduced_motion", "space_hero_light_mode", "nebula_image_fallback", "light_profile_contrast", "pointer_tracks_and_trails", "pointer_click_through", "pointer_pjax_pool_bound", "pointer_reduced_motion", "pointer_touch_disabled"]}))
 
 
 def run_browser_checks(port):
     with Browser(390, 844) as browser:
+        browser.command('Emulation.setTouchEmulationEnabled', {'enabled': True, 'maxTouchPoints': 1})
         browser.navigate(f'http://127.0.0.1:{port}/fixture.html')
+        assert browser.evaluate("document.querySelectorAll('#ab-pointer-light').length") == 0
         measure = "({count:document.querySelectorAll('#ab-mobile-navigation').length," \
             "paths:[...document.querySelectorAll('#ab-mobile-navigation a')].map(a=>new URL(a.href).pathname)})"
         initial = browser.evaluate(measure)
@@ -107,6 +111,29 @@ def run_browser_checks(port):
         assert browser.evaluate("getComputedStyle(document.querySelector('.author-info__name')).color") == 'rgb(47, 41, 64)'
         browser.evaluate("document.querySelector('#home_top').remove();document.dispatchEvent(new Event('pjax:complete'));true")
         assert browser.evaluate("document.querySelectorAll('#ab-space-hero').length") == 0
+
+
+def run_pointer_checks(port):
+    with Browser(1366, 900) as browser:
+        browser.navigate(f'http://127.0.0.1:{port}/fixture.html')
+        browser.evaluate("document.body.insertAdjacentHTML('beforeend','<button id=\"pointer-target\" onclick=\"document.body.dataset.pointerClicked=1\" style=\"position:fixed;left:60px;top:60px;width:120px;height:50px;z-index:5\">点击目标</button>');true")
+        for i in range(20):
+            browser.command('Input.dispatchMouseEvent', {'type': 'mouseMoved', 'x': 30 + i * 5, 'y': 80})
+            time.sleep(.04)
+        browser.evaluate('new Promise(r=>requestAnimationFrame(r))', promise=True)
+        assert browser.evaluate("document.querySelector('#ab-pointer-light').classList.contains('ab-pointer-visible')")
+        assert browser.evaluate("getComputedStyle(document.querySelector('.ab-pointer-halo')).transform") != 'none'
+        assert browser.evaluate("document.querySelector('#ab-pointer-light').getAnimations({subtree:true}).length") > 0
+        assert browser.evaluate("document.elementFromPoint(125,80).id") == 'pointer-target'
+        browser.command('Input.dispatchMouseEvent', {'type': 'mousePressed', 'x': 125, 'y': 80, 'button': 'left', 'clickCount': 1})
+        browser.command('Input.dispatchMouseEvent', {'type': 'mouseReleased', 'x': 125, 'y': 80, 'button': 'left', 'clickCount': 1})
+        assert browser.evaluate("document.body.dataset.pointerClicked") == '1'
+        browser.evaluate("for(let i=0;i<5;i++)document.dispatchEvent(new Event('pjax:complete'));true")
+        assert browser.evaluate("document.querySelectorAll('#ab-pointer-light').length") == 1
+        assert browser.evaluate("document.querySelectorAll('.ab-pointer-spark').length") == 12
+        browser.command('Emulation.setEmulatedMedia', {'features': [{'name': 'prefers-reduced-motion', 'value': 'reduce'}]})
+        browser.evaluate('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))', promise=True)
+        assert browser.evaluate("document.querySelectorAll('#ab-pointer-light').length") == 0
 
 if __name__ == "__main__":
     main()

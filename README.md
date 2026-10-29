@@ -78,6 +78,8 @@ Pjax 返回首页时恢复单一实例；不可见时暂停动态星点，系统
 
 素材、编辑源与 imagegen 提示词见 [素材说明](customization/assets/nebula/README.md)，背景 URL 和哈希位于 `config/visual-assets.json`。构图参考及平台适配调研见 [星空主题调研](docs/starry-theme-research-20261029.md)；未使用演示站图片或付费源码。
 
+桌面还提供 `pointer-effects.js` 鼠标光晕与短星尘：保留原指针，不拦截点击，最多复用 12 个星尘节点，鼠标静止后没有持续 JS 动画循环。触屏、减弱动效和节省流量模式关闭该效果。
+
 这是渐进增强：脚本不可用时展示 Hao 原始 Banner；背景文件失败时移除失效图片并保留暗色渐变、文字与入口。回退仅需恢复旧全局注入。
 
 ## 文章封面
