@@ -1,0 +1,255 @@
+/* ============================================================
+   aerospaceboy 定制样式 (Phase 7)
+   注入方式：Hao 主题设置 → 顶部 → Banner → 大标题（HTML 字段）
+   <style> 块随配置保存，升级 Hao 后配置不丢；无需改主题源码。
+   设计方向：深空 / 工程感 / 克制动画
+   ============================================================ */
+
+/* ---------- Design Tokens ---------- */
+:root {
+    --ab-radius: 14px;
+    --ab-border: 1px solid rgba(255, 255, 255, .07);
+    --ab-shadow: 0 4px 18px rgba(0, 0, 0, .22);
+    --ab-lift: -3px;
+}
+
+/* ---------- Hero：品牌层级 ---------- */
+.ab-sub-line {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    opacity: .88;
+    line-height: 1.4;
+    margin-top: 2px;
+}
+/* 技术方向标签：低饱和、小尺寸、克制 hover */
+.ab-tech-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 12px;
+    max-width: 340px;
+}
+.ab-tech-tags span {
+    font-size: 11px;
+    line-height: 1;
+    padding: 5px 10px;
+    border: 1px solid rgba(255, 255, 255, .16);
+    border-radius: 999px;
+    opacity: .7;
+    letter-spacing: .04em;
+    background: rgba(255, 255, 255, .03);
+    transition: opacity .2s ease, border-color .2s ease;
+}
+.ab-tech-tags span:hover {
+    opacity: 1;
+    border-color: rgba(255, 255, 255, .35);
+}
+
+/* ---------- Hero 图标墙：保留辨识度与技术色彩，整体压暗但不过度 ---------- */
+.tags-group-icon {
+    filter: grayscale(.45) brightness(.85);
+    opacity: .5;
+    transition: opacity .2s ease, filter .2s ease;
+}
+.tags-group-icon:hover {
+    opacity: .78;
+    filter: grayscale(.15) brightness(.95);
+}
+
+/* ---------- Profile 卡片：深空质感 ----------
+   主题用 #aside-content > .card-widget.card-info::before 画 15s 循环渐变动画，
+   这里改为静态深空渐变并停掉动画（减少合成开销，符合克制动效原则）。 */
+#aside-content > .card-widget.card-info::before {
+    background: linear-gradient(160deg, #151b26 0%, #0d1015 70%) !important;
+    background-size: 100% 100% !important;
+    animation: none !important;
+}
+#aside-content .card-info .card-content {
+    background-image: none !important;
+    background-color: #12161c;
+}
+
+/* ---------- 分类栏：隐藏"默认分类"入口（分类资源保留） ---------- */
+#category-bar-items .category-bar-item:has(> a[href="/categories/default"]) {
+    display: none;
+}
+
+/* ---------- Projects 视觉卡片 ---------- */
+.ab-proj-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+    margin: 1.2em 0;
+}
+.ab-proj-card {
+    border: var(--ab-border);
+    border-radius: var(--ab-radius);
+    padding: 18px 18px 16px;
+    background: rgba(255, 255, 255, .02);
+    transition: transform .2s ease, border-color .2s ease;
+}
+.ab-proj-card:hover {
+    transform: translateY(var(--ab-lift));
+    border-color: rgba(255, 255, 255, .16);
+}
+.ab-proj-card h3 {
+    margin: 0 0 8px;
+    font-size: 17px;
+    letter-spacing: .02em;
+}
+.ab-proj-card p {
+    margin: 0 0 12px;
+    font-size: 13.5px;
+    line-height: 1.7;
+    opacity: .75;
+}
+.ab-proj-kw {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+.ab-proj-kw span {
+    font-size: 11px;
+    line-height: 1;
+    padding: 4px 8px;
+    border: 1px solid rgba(255, 255, 255, .14);
+    border-radius: 999px;
+    opacity: .65;
+}
+@media (max-width: 768px) {
+    .ab-proj-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ---------- Cards：统一圆角 / 边框 / 轻阴影 / 克制 hover ---------- */
+.card-widget {
+    border-radius: var(--ab-radius);
+    border: var(--ab-border);
+    box-shadow: var(--ab-shadow);
+    transition: transform .2s ease, border-color .2s ease;
+}
+.card-widget:hover {
+    transform: translateY(var(--ab-lift));
+    border-color: rgba(255, 255, 255, .14);
+}
+.recent-post-item {
+    border-radius: var(--ab-radius);
+    border: var(--ab-border);
+    transition: transform .2s ease, border-color .2s ease;
+}
+.recent-post-item:hover {
+    transform: translateY(var(--ab-lift));
+    border-color: rgba(255, 255, 255, .16);
+}
+
+/* ---------- Typography：中文阅读优先 ---------- */
+#article-container {
+    font-size: 16.5px;
+    line-height: 1.85;
+}
+#article-container p {
+    margin: 0 0 1.1em;
+}
+#article-container h1,
+#article-container h2,
+#article-container h3 {
+    margin: 1.6em 0 .7em;
+    line-height: 1.45;
+}
+#article-container blockquote {
+    opacity: .85;
+    border-left: 3px solid rgba(255, 255, 255, .18);
+}
+#article-container ul,
+#article-container ol {
+    margin: 0 0 1.1em;
+}
+@media (min-width: 1200px) {
+    #article-container {
+        max-width: 820px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+/* ---------- Empty State：首页无文章时 ---------- */
+#recent-posts:not(:has(.recent-post-item)) #pagination {
+    display: none;
+}
+#recent-posts:not(:has(.recent-post-item))::after {
+    content: "这里还没有正式文章，新的技术记录正在路上。";
+    display: block;
+    width: 100%;
+    text-align: center;
+    opacity: .4;
+    font-size: 14px;
+    padding: 72px 0 48px;
+    letter-spacing: .05em;
+}
+
+/* ---------- Mobile 精修 ---------- */
+@media (max-width: 768px) {
+    /* 横向溢出防护：分类栏为横向滚动条，页面本体不产生横向滚动 */
+    html,
+    body {
+        overflow-x: hidden;
+    }
+    #recent-posts {
+        overflow-x: hidden;
+    }
+    /* Hao 在 ≤768px 隐藏整块 Banner，此处补一行紧凑品牌标识 */
+    #recent-posts::before {
+        content: "半截的诗 · aerospaceboy";
+        display: block;
+        text-align: center;
+        font-size: 13px;
+        letter-spacing: .18em;
+        opacity: .55;
+        padding: 18px 0 4px;
+    }
+    .banners-title-big {
+        font-size: 28px;
+    }
+    .ab-sub-line {
+        font-size: 17px;
+    }
+    .ab-tech-tags {
+        max-width: 100%;
+        gap: 5px;
+    }
+    .ab-tech-tags span {
+        font-size: 10.5px;
+        padding: 4px 8px;
+    }
+    #article-container {
+        font-size: 16px;
+    }
+    .card-widget {
+        border-radius: 12px;
+    }
+    .recent-post-item {
+        height: auto;
+    }
+    /* 空状态文案在窄屏换行 */
+    #recent-posts:not(:has(.recent-post-item))::after {
+        max-width: 88%;
+        margin: 0 auto;
+        padding: 40px 0 32px;
+        overflow-wrap: break-word;
+    }
+}
+
+/* ---------- Motion：尊重减弱动效偏好 ---------- */
+@media (prefers-reduced-motion: reduce) {
+    .card-widget,
+    .recent-post-item,
+    .ab-tech-tags span {
+        transition: none !important;
+    }
+    .card-widget:hover,
+    .recent-post-item:hover {
+        transform: none;
+    }
+}
