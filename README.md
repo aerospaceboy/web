@@ -60,7 +60,7 @@ Linux 对应使用 `.venv/bin/python`。浏览器检查另外需要 Microsoft Ed
 .\.venv\Scripts\python.exe -m blog_tools.build
 ```
 
-生成 `build/global-head.html` 和首页、关于页描述文件。全局文件包含 CSS 与手机导航兼容脚本，按 [部署步骤](docs/deployment.md) 合并到 Halo **设置 → 代码注入 → 全局 head 标签**，同时移除首页 Banner 中的旧定制样式块，并修正 SEO 与页面摘要。
+生成 `build/global-head.html` 和首页、关于页描述文件。全局文件包含 CSS、手机导航兼容脚本与轨道首页增强脚本，按 [部署步骤](docs/deployment.md) 合并到 Halo **设置 → 代码注入 → 全局 head 标签**，同时移除首页 Banner 中的旧定制样式块，并修正 SEO 与页面摘要。
 
 GitHub 推送与生成文件不会自动修改线上配置。
 
@@ -69,6 +69,12 @@ GitHub 推送与生成文件不会自动修改线上配置。
 ```
 
 公网审计会核对全站 CSS 和脚本的实际内容、首页及关于页描述、七篇文章封面、许可链接、RSS 和 Sitemap，并下载八张封面核对大小、MIME 与 SHA256。隐私页占位内容单独列为 warnings，技术检查通过不代表隐私内容已经完善。HTTP 200 但样式或摘要不正确时，仍然报告失败。
+
+## 轨道首页视觉
+
+`customization/space-effects.js` 与 CSS 一起构建到全局注入中：首页使用 SVG 轨道球、青色入口、鼠标光晕和卡片悬浮效果。没有额外图片请求或第三方动效库。Pjax 返回首页时恢复单一实例；不可见时暂停轨道动画，系统减弱动效偏好下保留静态画面。手机使用紧凑品牌区，浅色模式有独立配色。
+
+这是渐进增强：脚本不可用时仍展示 Hao 原始 Banner；项目、文章正文和链接由现有站点提供。回退仅需恢复旧全局注入。
 
 ## 文章封面
 

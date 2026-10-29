@@ -27,3 +27,4 @@ jobs:
       - run: python .make-posts.py --dry-run
       - run: python -m blog_tools.build
       - run: node --check customization/mobile-navigation.js
+      - run: node --check customization/space-effects.js

@@ -52,7 +52,7 @@ def main():
             server.shutdown()
             server.server_close()
             worker.join()
-    print(json.dumps({"ok": True, "scenarios": ["flat_and_mixed_menu", "repeat_pjax", "menu_update", "native_menu_recovery", "theme_toggle", "disabled_widgets", "native_loading_preserved", "privacy_link", "copy_success", "copy_denied", "visible_cover_priority", "cover_fallback"]}))
+    print(json.dumps({"ok": True, "scenarios": ["flat_and_mixed_menu", "repeat_pjax", "menu_update", "native_menu_recovery", "theme_toggle", "disabled_widgets", "native_loading_preserved", "privacy_link", "copy_success", "copy_denied", "visible_cover_priority", "cover_fallback", "space_hero_pjax", "space_hero_page_exit", "space_hero_reduced_motion", "space_hero_light_mode"]}))
 
 
 def run_browser_checks(port):
@@ -92,6 +92,16 @@ def run_browser_checks(port):
         fallback = browser.evaluate("(()=>{const i=document.querySelector('img.post_bg');i.dispatchEvent(new Event('error'));return {path:new URL(i.src).pathname,lazy:i.hasAttribute('data-lazy-src')}})()")
         assert fallback == {'path': '/upload/ab-cover-default-v1.webp', 'lazy': False}, fallback
         assert browser.evaluate("document.dispatchEvent(new Event('pjax:complete'));document.querySelectorAll('#ab-mobile-navigation').length") == 0
+        browser.evaluate("document.body.insertAdjacentHTML('beforeend','<div id=\"home_top\"><div id=\"recent-top-post-group\"><div class=\"banners-title-big\">测试品牌</div><div class=\"banners-title-small\">测试描述</div></div></div>');document.dispatchEvent(new Event('pjax:complete'));true")
+        browser.evaluate("document.dispatchEvent(new Event('pjax:complete'));window.__abInstallSpaceHero();true")
+        hero = browser.evaluate("({count:document.querySelectorAll('#ab-space-hero').length,title:document.querySelector('#ab-space-title').textContent,description:document.querySelector('.ab-hero-description').textContent,original:getComputedStyle(document.querySelector('#recent-top-post-group')).display,paths:[...document.querySelectorAll('.ab-hero-actions a')].map(a=>new URL(a.href).pathname),buttons:[...document.querySelectorAll('.ab-hero-actions a')].every(a=>a.getBoundingClientRect().height>=44)})")
+        assert hero == {'count': 1, 'title': '测试品牌', 'description': '测试描述', 'original': 'none', 'paths': ['/projects', '/archives'], 'buttons': True}, hero
+        browser.command('Emulation.setEmulatedMedia', {'features': [{'name': 'prefers-reduced-motion', 'value': 'reduce'}]})
+        assert browser.evaluate("getComputedStyle(document.querySelector('.ab-orbit-track')).animationName") == 'none'
+        browser.evaluate("document.documentElement.dataset.theme='light';true")
+        assert browser.evaluate("getComputedStyle(document.querySelector('#ab-space-hero')).color") == 'rgb(23, 43, 66)'
+        browser.evaluate("document.querySelector('#home_top').remove();document.dispatchEvent(new Event('pjax:complete'));true")
+        assert browser.evaluate("document.querySelectorAll('#ab-space-hero').length") == 0
 
 if __name__ == "__main__":
     main()
