@@ -7,11 +7,12 @@ from html.parser import HTMLParser
 import json
 from pathlib import Path
 from urllib.error import HTTPError, URLError
+from urllib.parse import urljoin, urlsplit
 from urllib.request import Request, urlopen
 import xml.etree.ElementTree as ET
 
 from . import configure_console
-from .build import NAV_ID, STYLE_ID
+from .build import NAV_ID, STYLE_ID, navigation_source
 from .halo import validate_base_url
 from .publish import ROOT
 
@@ -23,6 +24,8 @@ class PageMetadata(HTMLParser):
         self.styles = []
         self.legacy_styles = 0
         self.navigation = []
+        self.links = []
+        self.cover_sources = []
         self._style_attrs = None
         self._style_text = []
         self._script_attrs = None
@@ -30,6 +33,12 @@ class PageMetadata(HTMLParser):
 
     def handle_starttag(self, tag, attrs):
         attrs = dict(attrs)
+        if tag == "a" and attrs.get("href"):
+            self.links.append(attrs["href"])
+        if tag == "img" and ('post_bg' in attrs.get('class', '').split() or attrs.get('alt') == 'cover'):
+            source = attrs.get('data-lazy-src') or attrs.get('data-src') or attrs.get('src')
+            if source:
+                self.cover_sources.append(source)
         if tag == "meta":
             key = attrs.get("name", attrs.get("property"))
             if key:
@@ -65,10 +74,13 @@ def content_hash(text):
     return hashlib.sha256((text.replace("\r\n", "\n").strip() + "\n").encode("utf-8")).hexdigest()
 
 
-def inspect_html(path, source, config, digest, navigation_digest=None):
+def inspect_html(path, source, config, digest, navigation_digest=None, covers=None):
     page = PageMetadata()
     page.feed(source)
     issues = []
+    warnings = []
+    if path == config.get('privacy_policy_path') and '请在此处添加你的隐私政策内容' in source:
+        warnings.append('privacy_policy_placeholder_content')
     if len(page.styles) != 1:
         issues.append("expected_one_global_style")
     elif page.styles[0].get("data-ab-sha256") != digest:
@@ -87,19 +99,49 @@ def inspect_html(path, source, config, digest, navigation_digest=None):
         issues.append("mobile_navigation_version_mismatch")
     elif navigation_digest is not None and page.navigation[0].get("actual_sha256") != navigation_digest:
         issues.append("mobile_navigation_content_mismatch")
-    return {"path": path, "issues": issues,
+    base = config.get("base_url", "https://aerospaceboy.site")
+    if '/cc' in page.links:
+        issues.append('broken_legacy_license_link')
+    client_rewrites = {}
+    if '/privacy' in page.links:
+        if config.get('privacy_policy_path') and navigation_digest is not None:
+            client_rewrites['/privacy'] = config['privacy_policy_path']
+        else:
+            issues.append('legacy_privacy_link_without_compatibility')
+    if covers is not None:
+        paths = {urlsplit(urljoin(base, value)).path for value in page.cover_sources}
+        if any(urlsplit(urljoin(base, value)).netloc != urlsplit(base).netloc for value in page.cover_sources):
+            issues.append('external_article_cover')
+        expected = {urlsplit(record['url']).path for slug, record in covers.items() if slug != 'default'}
+        if path == '/' and not expected.issubset(paths):
+            issues.append('homepage_cover_mapping_mismatch')
+        slug = path.removeprefix('/archives/')
+        if path.startswith('/archives/') and slug in covers:
+            if not page.cover_sources or urlsplit(urljoin(base, page.cover_sources[0])).path != urlsplit(covers[slug]['url']).path:
+                issues.append('article_cover_mismatch')
+            if config.get('license_url') not in page.links:
+                issues.append('license_destination_mismatch')
+    return {"path": path, "issues": issues, "warnings": warnings,
             "description": page.meta.get("description", []),
             "og_description": page.meta.get("og:description", []),
-            "global_style_count": len(page.styles)}
+            "global_style_count": len(page.styles), "cover_sources": page.cover_sources,
+            "client_link_rewrites": client_rewrites}
 
 
 def audit(config):
     base = validate_base_url(config["base_url"])
     css = (ROOT / "customization/aerospaceboy-custom.css").read_text(encoding="utf-8")
     digest = content_hash(css)
-    navigation = (ROOT / "customization/mobile-navigation.js").read_text(encoding="utf-8")
+    navigation = navigation_source(config)
     navigation_digest = content_hash(navigation)
+    covers_path = ROOT / 'config/covers.json'
+    covers = json.loads(covers_path.read_text(encoding='utf-8-sig')) if covers_path.exists() else None
     paths = ["/", "/archives", "/projects", "/about", "/archives/pid-control-intro", "/rss.xml", "/sitemap.xml"]
+    if covers is not None:
+        paths.extend('/archives/' + slug for slug in covers if slug != 'default')
+    if config.get('privacy_policy_path'):
+        paths.append(config['privacy_policy_path'])
+    paths = list(dict.fromkeys(paths))
 
     def check(path):
         try:
@@ -115,7 +157,7 @@ def audit(config):
                 if result["entries"] == 0:
                     result["issues"].append("empty_feed_or_sitemap")
             else:
-                result = inspect_html(path, source, config, digest, navigation_digest)
+                result = inspect_html(path, source, config, digest, navigation_digest, covers)
             result["status"] = status
             if redirected:
                 result["issues"].append("unexpected_redirect")
@@ -125,7 +167,25 @@ def audit(config):
 
     with ThreadPoolExecutor(max_workers=4) as pool:
         results = list(pool.map(check, paths))
-    return {"target": base, "ok": all(not result["issues"] for result in results), "pages": results}
+    assets = []
+    if covers is not None:
+        def check_asset(item):
+            slug, record = item
+            if urlsplit(record['url']).netloc != urlsplit(base).netloc:
+                return {'slug': slug, 'ok': False, 'error': 'asset_origin_mismatch'}
+            try:
+                with urlopen(record['url'], timeout=15) as response:
+                    data = response.read(1024 * 1024 + 1)
+                    actual_hash = hashlib.sha256(data).hexdigest()
+                    ok = (actual_hash == record['sha256'] and len(data) == record['bytes'] and
+                          response.headers.get_content_type() == 'image/webp')
+                return {'slug': slug, 'ok': ok, 'bytes': len(data), 'sha256': actual_hash}
+            except (HTTPError, URLError, OSError):
+                return {'slug': slug, 'ok': False, 'error': 'asset_request_failed'}
+        with ThreadPoolExecutor(max_workers=4) as pool:
+            assets = list(pool.map(check_asset, covers.items()))
+    return {"target": base, "ok": all(not result["issues"] for result in results) and all(a['ok'] for a in assets),
+            "pages": results, "assets": assets}
 
 
 def main(argv=None):

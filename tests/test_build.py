@@ -4,6 +4,7 @@ import tempfile
 import unittest
 
 from blog_tools.build import NAV_ID, STYLE_ID, build
+from blog_tools.build import navigation_source
 
 
 class StyleParser(HTMLParser):
@@ -37,3 +38,7 @@ class BuildTests(unittest.TestCase):
             self.assertEqual(build(first), build(second))
             self.assertEqual((Path(first) / "global-head.html").read_bytes(),
                              (Path(second) / "global-head.html").read_bytes())
+
+    def test_public_config_rejects_external_privacy_destinations(self):
+        with self.assertRaisesRegex(ValueError, 'site origin'):
+            navigation_source({'privacy_policy_path': '//example.com/privacy'})

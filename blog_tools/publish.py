@@ -8,7 +8,7 @@ from pathlib import Path
 import re
 import sys
 import time
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlsplit
 
 from markdown_it import MarkdownIt
 
@@ -58,6 +58,15 @@ def validate_posts(posts):
         if not isinstance(post.get("tags"), list) or not all(
                 isinstance(tag, str) and SLUG.fullmatch(tag) for tag in post["tags"]):
             raise ValueError(f"Article {slug} has invalid tags")
+        cover = post.get('cover', '')
+        if not isinstance(cover, str):
+            raise ValueError(f"Article {slug} has an invalid cover")
+        if cover:
+            parsed = urlsplit(cover)
+            relative = cover.startswith('/') and not cover.startswith('//')
+            secure = parsed.scheme == 'https' and parsed.hostname and not parsed.username and not parsed.password
+            if not (relative or secure) or any(c in cover for c in '\r\n<>\\'):
+                raise ValueError(f"Article {slug} has an invalid cover")
 
 
 def taxonomy_map(items, kind):
@@ -96,7 +105,7 @@ class Publisher:
             "spec": {"title": post["title"], "slug": post["slug"], "owner": self.owner,
                      "publish": False, "pinned": False, "allowComment": True,
                      "visible": "PUBLIC", "priority": 0, "deleted": False,
-                     "excerpt": {"autoGenerate": True, "raw": ""}, "cover": "",
+                     "excerpt": {"autoGenerate": True, "raw": ""}, "cover": post.get('cover', ''),
                      "categories": [categories[post["category"]]],
                      "tags": [tags[t] for t in post["tags"]]},
         }
@@ -200,7 +209,8 @@ def main(argv=None):
         posts = load_posts(args.manifest)
         if not args.apply:
             result = {"mode": "dry-run", "target": config["base_url"], "owner": config["owner"],
-                      "articles": [{k: p[k] for k in ("slug", "title", "category", "tags")} for p in posts]}
+                      "articles": [{**{k: p[k] for k in ("slug", "title", "category", "tags")},
+                                    'cover': p.get('cover', '')} for p in posts]}
         else:
             api = HaloClient(config["base_url"], os.environ.get("HALO_PAT", ""))
             result = Publisher(api, config["owner"]).run(posts)

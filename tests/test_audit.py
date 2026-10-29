@@ -39,3 +39,32 @@ class AuditTests(unittest.TestCase):
         source = f'<style id="{STYLE_ID}" data-ab-sha256="abc"></style>'
         self.assertIn("mobile_navigation_version_mismatch",
                       inspect_html("/projects", source, {}, "abc", "nav-hash")["issues"])
+
+    def test_lazy_cover_sources_are_checked_for_external_requests(self):
+        source = '<img class="post_bg" src="" data-lazy-src="https://picsum.photos/600/400?random">'
+        covers = {'demo': {'url': 'https://aerospaceboy.site/upload/demo.webp'}}
+        result = inspect_html('/', source, {}, 'abc', covers=covers)
+        self.assertIn('external_article_cover', result['issues'])
+        self.assertIn('homepage_cover_mapping_mismatch', result['issues'])
+
+    def test_correct_lazy_cover_mapping_passes_media_checks(self):
+        source = '<img class="post_bg" src="" data-lazy-src="/upload/demo.webp">'
+        covers = {'demo': {'url': 'https://aerospaceboy.site/upload/demo.webp'}}
+        result = inspect_html('/', source, {}, 'abc', covers=covers)
+        self.assertNotIn('external_article_cover', result['issues'])
+        self.assertNotIn('homepage_cover_mapping_mismatch', result['issues'])
+
+    def test_legacy_license_and_privacy_links_are_not_silently_accepted(self):
+        result = inspect_html('/archives/demo', '<a href="/cc">CC</a><a href="/privacy">隐私政策</a>', {}, 'abc')
+        self.assertIn('broken_legacy_license_link', result['issues'])
+        self.assertIn('legacy_privacy_link_without_compatibility', result['issues'])
+
+    def test_related_cover_does_not_hide_wrong_article_cover(self):
+        source = '<img alt="cover" src="/upload/wrong.webp"><img class="post_bg" src="/upload/demo.webp">'
+        result = inspect_html('/archives/demo', source, {}, 'abc', covers={'demo': {'url': '/upload/demo.webp'}})
+        self.assertIn('article_cover_mismatch', result['issues'])
+
+    def test_placeholder_policy_is_reported_as_content_warning(self):
+        result = inspect_html('/privacy-policy', '请在此处添加你的隐私政策内容。',
+                              {'privacy_policy_path': '/privacy-policy'}, 'abc')
+        self.assertIn('privacy_policy_placeholder_content', result['warnings'])

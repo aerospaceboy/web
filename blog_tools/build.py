@@ -12,6 +12,17 @@ STYLE_ID = "aerospaceboy-global-style"
 NAV_ID = "aerospaceboy-mobile-navigation-script"
 
 
+def navigation_source(config):
+    settings = {"privacyPolicyPath": config.get("privacy_policy_path", "/privacy-policy"),
+                "defaultCoverPath": config.get("default_cover_path", "")}
+    for value in settings.values():
+        if value and (not isinstance(value, str) or not value.startswith("/") or
+                      value.startswith("//") or any(c in value for c in "\r\n<>\\")):
+            raise ValueError("Public paths must be relative to the site origin")
+    prefix = "window.__abPublicConfig = " + json.dumps(settings, ensure_ascii=True).replace("<", "\\u003c") + ";\n"
+    return prefix + (ROOT / "customization/mobile-navigation.js").read_text(encoding="utf-8")
+
+
 def build(output=ROOT / "build", config_path=ROOT / "config/site.json"):
     output = Path(output)
     config = json.loads(Path(config_path).read_text(encoding="utf-8-sig"))
@@ -19,7 +30,7 @@ def build(output=ROOT / "build", config_path=ROOT / "config/site.json"):
     if "</style" in css.lower():
         raise ValueError("CSS contains a closing style tag")
     digest = hashlib.sha256(css.encode("utf-8")).hexdigest()
-    navigation = (ROOT / "customization/mobile-navigation.js").read_text(encoding="utf-8")
+    navigation = navigation_source(config)
     if "</script" in navigation.lower():
         raise ValueError("Navigation contains a closing script tag")
     navigation_digest = hashlib.sha256(navigation.encode("utf-8")).hexdigest()

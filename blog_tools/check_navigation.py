@@ -3,6 +3,9 @@
 import json
 from pathlib import Path
 import tempfile
+from functools import partial
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
+from threading import Thread
 
 from . import configure_console
 from .browser import Browser
@@ -21,7 +24,6 @@ def main():
         fixture = directory / "fixture.html"
         fixture.write_text('<!doctype html><html><head><meta charset="utf-8">'
             '<meta name="viewport" content="width=device-width,initial-scale=1">'
-            '<base href="https://aerospaceboy.site/">'
             '<script>var navFn={switchDarkMode(){document.documentElement.dataset.theme='
             'document.documentElement.dataset.theme==="dark"?"light":"dark";}};'
             'var heo={hideLoading(){document.querySelector("#loading-box").classList.add("loaded");}};'
@@ -33,36 +35,63 @@ def main():
             '<a class="site-page" href="javascript:void(0)">分组</a></header>'
             '<aside id="sidebar-menus"><a href="/about">原有关于入口</a>'
             '<a class="darkmode_switchbutton" onclick="rm.switchDarkMode()">显示模式</a></aside>'
+            '<div class="comment-randomInfo"><a href="/privacy">隐私政策</a></div>'
+            '<button class="post-copyright-copybtn" onclick="rm.copyPageUrl()">复制</button>'
+            '<div id="recent-posts"><img class="post_bg" width="10" height="10" '
+            'data-lazy-src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=="></div>'
             '</body></html>', encoding="utf-8")
-        with Browser(390, 844) as browser:
-            browser.navigate(fixture.as_uri())
-            measure = "({count:document.querySelectorAll('#ab-mobile-navigation').length," \
-                "paths:[...document.querySelectorAll('#ab-mobile-navigation a')].map(a=>new URL(a.href).pathname)})"
-            initial = browser.evaluate(measure)
-            assert initial == {"count": 1, "paths": ["/", "/projects"]}, initial
-            browser.evaluate("document.dispatchEvent(new Event('pjax:complete'));true")
-            repeated = browser.evaluate(measure)
-            assert repeated == initial, repeated
-            browser.evaluate("document.querySelector('#menus').insertAdjacentHTML('beforeend',"
-                             "'<a class=\"site-page\" href=\"/archives\">文章</a>');"
-                             "document.dispatchEvent(new Event('pjax:complete'));true")
-            updated = browser.evaluate(measure)
-            assert updated["paths"] == ["/", "/projects", "/archives"], updated
-            browser.evaluate("document.querySelector('#sidebar-menus').insertAdjacentHTML('beforeend',"
-                             "'<a href=\"/\">首页</a><a href=\"/projects\">项目</a><a href=\"/archives\">文章</a>');"
-                             "document.dispatchEvent(new Event('pjax:complete'));true")
-            native = browser.evaluate(measure)
-            assert native == {"count": 0, "paths": []}, native
-            browser.evaluate("document.documentElement.dataset.theme='dark';"
-                             "document.querySelector('.darkmode_switchbutton').click();true")
-            assert browser.evaluate("document.documentElement.dataset.theme") == "light"
-            browser.evaluate("document.querySelector('.darkmode_switchbutton').click();true")
-            assert browser.evaluate("document.documentElement.dataset.theme") == "dark"
-            assert browser.evaluate("heo.hideLoading();rm.hideRightMenu();true") is True
-            browser.evaluate("document.body.insertAdjacentHTML('beforeend','<div id=\"loading-box\"></div>');heo.hideLoading();true")
-            assert browser.evaluate("document.querySelector('#loading-box').classList.contains('loaded')")
-    print(json.dumps({"ok": True, "scenarios": ["flat_and_mixed_menu", "repeat_pjax", "menu_update", "native_menu_recovery", "theme_toggle", "disabled_widgets", "native_loading_preserved"]}))
+        class QuietHandler(SimpleHTTPRequestHandler):
+            def log_message(self, *args):
+                pass
+        server = ThreadingHTTPServer(('127.0.0.1', 0), partial(QuietHandler, directory=str(directory)))
+        worker = Thread(target=server.serve_forever, daemon=True)
+        worker.start()
+        try:
+            run_browser_checks(server.server_port)
+        finally:
+            server.shutdown()
+            server.server_close()
+            worker.join()
+    print(json.dumps({"ok": True, "scenarios": ["flat_and_mixed_menu", "repeat_pjax", "menu_update", "native_menu_recovery", "theme_toggle", "disabled_widgets", "native_loading_preserved", "privacy_link", "copy_success", "copy_denied", "visible_cover_priority", "cover_fallback"]}))
 
+
+def run_browser_checks(port):
+    with Browser(390, 844) as browser:
+        browser.navigate(f'http://127.0.0.1:{port}/fixture.html')
+        measure = "({count:document.querySelectorAll('#ab-mobile-navigation').length," \
+            "paths:[...document.querySelectorAll('#ab-mobile-navigation a')].map(a=>new URL(a.href).pathname)})"
+        initial = browser.evaluate(measure)
+        assert initial == {"count": 1, "paths": ["/", "/projects"]}, initial
+        browser.evaluate("document.dispatchEvent(new Event('pjax:complete'));true")
+        repeated = browser.evaluate(measure)
+        assert repeated == initial, repeated
+        browser.evaluate("document.querySelector('#menus').insertAdjacentHTML('beforeend',"
+                         "'<a class=\"site-page\" href=\"/archives\">文章</a>');"
+                         "document.dispatchEvent(new Event('pjax:complete'));true")
+        updated = browser.evaluate(measure)
+        assert updated["paths"] == ["/", "/projects", "/archives"], updated
+        browser.evaluate("document.querySelector('#sidebar-menus').insertAdjacentHTML('beforeend',"
+                         "'<a href=\"/\">首页</a><a href=\"/projects\">项目</a><a href=\"/archives\">文章</a>');"
+                         "document.dispatchEvent(new Event('pjax:complete'));true")
+        native = browser.evaluate(measure)
+        assert native == {"count": 0, "paths": []}, native
+        browser.evaluate("document.documentElement.dataset.theme='dark';"
+                         "document.querySelector('.darkmode_switchbutton').click();true")
+        assert browser.evaluate("document.documentElement.dataset.theme") == "light"
+        browser.evaluate("document.querySelector('.darkmode_switchbutton').click();true")
+        assert browser.evaluate("document.documentElement.dataset.theme") == "dark"
+        assert browser.evaluate("heo.hideLoading();rm.hideRightMenu();true") is True
+        browser.evaluate("document.body.insertAdjacentHTML('beforeend','<div id=\"loading-box\"></div>');heo.hideLoading();true")
+        assert browser.evaluate("document.querySelector('#loading-box').classList.contains('loaded')")
+        assert browser.evaluate("document.querySelector('.comment-randomInfo a').getAttribute('href')") == '/privacy-policy'
+        browser.evaluate("Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async text=>{document.body.dataset.copied=text}}});document.querySelector('.post-copyright-copybtn').click();true")
+        assert browser.evaluate("document.body.dataset.copied === location.href && document.querySelector('.post-copyright-copybtn').getAttribute('aria-label') === '文章链接已复制'")
+        assert browser.evaluate("(async()=>{navigator.clipboard.writeText=async()=>{throw new Error('denied')};return await rm.copyPageUrl()})()", promise=True) is False
+        assert browser.evaluate("document.querySelector('.post-copyright-copybtn').getAttribute('aria-label')") == '复制失败，请手动复制地址栏'
+        assert browser.evaluate("(()=>{const i=document.querySelector('img.post_bg');return i.loading==='eager' && i.fetchPriority==='high' && i.complete && i.naturalWidth===1})()")
+        fallback = browser.evaluate("(()=>{const i=document.querySelector('img.post_bg');i.dispatchEvent(new Event('error'));return {path:new URL(i.src).pathname,lazy:i.hasAttribute('data-lazy-src')}})()")
+        assert fallback == {'path': '/upload/ab-cover-default-v1.webp', 'lazy': False}, fallback
+        assert browser.evaluate("document.dispatchEvent(new Event('pjax:complete'));document.querySelectorAll('#ab-mobile-navigation').length") == 0
 
 if __name__ == "__main__":
     main()

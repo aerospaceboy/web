@@ -106,6 +106,19 @@ class PublishTests(unittest.TestCase):
         self.assertEqual(sum(method == "POST" for method, _, _ in self.api.calls), 1)
         self.assertEqual(sum("/publish" in path for _, path, _ in self.api.calls), 1)
 
+    def test_planned_cover_is_preserved_in_created_article(self):
+        post = copy.deepcopy(POST)
+        post['cover'] = '/upload/demo.webp'
+        self.assertEqual(self.publisher.run([post])['published'], ['demo'])
+        self.assertEqual(next(iter(self.api.posts.values()))['spec']['cover'], '/upload/demo.webp')
+
+    def test_unsafe_cover_url_prevents_all_mutations(self):
+        post = copy.deepcopy(POST)
+        post['cover'] = 'javascript:alert(1)'
+        with self.assertRaisesRegex(ValueError, 'cover'):
+            self.publisher.run([post])
+        self.assertEqual(self.api.calls, [])
+
     def test_ambiguous_creation_is_reconciled_without_second_post(self):
         self.api.ambiguous_create = True
         self.assertEqual(self.run_posts()["published"], ["demo"])

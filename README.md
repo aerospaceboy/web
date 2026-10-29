@@ -2,7 +2,7 @@
 
 个人技术博客 [aerospaceboy.site](https://aerospaceboy.site/) 的主题定制、内容与维护工具。
 
-仓库保存 Halo 博客的定制成果，未包含 Halo 核心源码、完整主题、数据库和附件，克隆后不能直接启动或完整恢复网站。
+仓库保存 Halo 博客的定制成果，未包含 Halo 核心源码、完整主题、数据库和完整附件库，克隆后不能直接启动或完整恢复网站。
 
 ## 快速开始
 
@@ -24,6 +24,7 @@ Linux 对应使用 `.venv/bin/python`。浏览器检查另外需要 Microsoft Ed
 | --- | --- |
 | `blog_tools/` | Halo 请求、文章发布、样式构建、公网审计和 CDP 浏览器工具 |
 | `config/site.json` | 站点域名、作者、首页与关于页描述，不保存凭据 |
+| `config/covers.json`、`customization/assets/covers/` | 已上线封面 URL、大小与 SHA256，以及可编辑 SVG 和 WebP 导出 |
 | `content/posts.json`、`content/posts/` | 七篇分类起始文章的清单与独立 Markdown 正文 |
 | `customization/` | 当前 CSS，以及历史定制方案、页面文案与素材需求 |
 | `docs/` | 当前维护状态、部署步骤和备份恢复边界 |
@@ -67,7 +68,18 @@ GitHub 推送与生成文件不会自动修改线上配置。
 .\.venv\Scripts\python.exe -m blog_tools.audit --output reports/live-audit.json
 ```
 
-公网审计会核对全站样式标识、CSS 版本、首页及关于页描述、RSS 和 Sitemap。HTTP 200 但样式或摘要不正确时，仍然报告失败。
+公网审计会核对全站 CSS 和脚本的实际内容、首页及关于页描述、七篇文章封面、许可链接、RSS 和 Sitemap，并下载八张封面核对大小、MIME 与 SHA256。隐私页占位内容单独列为 warnings，技术检查通过不代表隐私内容已经完善。HTTP 200 但样式或摘要不正确时，仍然报告失败。
+
+## 文章封面
+
+七篇文章和默认占位图已使用本站附件，避免依赖随机图片服务。素材在 `customization/assets/covers/`，每张 WebP 约 19–26 KB，八张共 179088 字节。
+
+```powershell
+.\.venv\Scripts\python.exe -m blog_tools.cover_assets
+.\.venv\Scripts\python.exe -m blog_tools.cover_assets --webp
+```
+
+第一条只生成 SVG，第二条使用 Edge 导出 WebP。SVG 源码可重复生成；不同平台字体和浏览器版本可能影响 WebP 导出的像素与哈希。更新图片后需上传 Halo、修改 URL/哈希清单并重新验收。现有文章通过后台元数据设置绑定封面；发布器只在新建草稿时使用清单中的 `cover`，不会覆盖已有正式文章。
 
 ## 浏览器检查
 

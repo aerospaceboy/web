@@ -7,7 +7,8 @@
       "stm32",
       "c-cpp"
     ],
-    "file": "posts/stm32-dev-env.md"
+    "file": "posts/stm32-dev-env.md",
+    "cover": "/upload/ab-cover-stm32-dev-env-v1.webp"
   },
   {
     "slug": "yolo-training-to-edge",
@@ -18,7 +19,8 @@
       "python",
       "computer-vision"
     ],
-    "file": "posts/yolo-training-to-edge.md"
+    "file": "posts/yolo-training-to-edge.md",
+    "cover": "/upload/ab-cover-yolo-training-to-edge-v1.webp"
   },
   {
     "slug": "ros2-basics",
@@ -29,7 +31,8 @@
       "linux",
       "python"
     ],
-    "file": "posts/ros2-basics.md"
+    "file": "posts/ros2-basics.md",
+    "cover": "/upload/ab-cover-ros2-basics-v1.webp"
   },
   {
     "slug": "pid-control-intro",
@@ -38,14 +41,16 @@
     "tags": [
       "python"
     ],
-    "file": "posts/pid-control-intro.md"
+    "file": "posts/pid-control-intro.md",
+    "cover": "/upload/ab-cover-pid-control-intro-v1.webp"
   },
   {
     "slug": "project-log-template",
     "title": "项目记录模板：从立项到复盘",
     "category": "project-log",
     "tags": [],
-    "file": "posts/project-log-template.md"
+    "file": "posts/project-log-template.md",
+    "cover": "/upload/ab-cover-project-log-template-v1.webp"
   },
   {
     "slug": "study-roadmap",
@@ -55,13 +60,15 @@
       "c-cpp",
       "python"
     ],
-    "file": "posts/study-roadmap.md"
+    "file": "posts/study-roadmap.md",
+    "cover": "/upload/ab-cover-study-roadmap-v1.webp"
   },
   {
     "slug": "contest-prep-template",
     "title": "竞赛备赛流程模板",
     "category": "contest-log",
     "tags": [],
-    "file": "posts/contest-prep-template.md"
+    "file": "posts/contest-prep-template.md",
+    "cover": "/upload/ab-cover-contest-prep-template-v1.webp"
   }
 ]

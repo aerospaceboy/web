@@ -65,3 +65,16 @@
 - [Halo 代码注入和 SEO 设置](https://docs.halo.run/guide/use/settings)：全局 head 作用于所有页面，SEO 站点描述作用于首页。
 - [Halo 2.27.1 PostEndpoint](https://github.com/halo-dev/halo/blob/v2.27.1/application/src/main/java/run/halo/app/core/endpoint/console/PostEndpoint.java)：草稿正文回读使用 `head-content`，发布正文回读使用 `release-content`；`content` GET 另需 snapshotName，不能用于无参数回读。
 - [Hao 侧栏模板](https://github.com/chengzhongxue/halo-theme-hao/blob/3afd1752d97d57dbd00f51a6ebc0dbc35ce1ac5a/templates/modules/sidebar.html)：主菜单项被限制为含子菜单才渲染，与本站一级主菜单结构不符。
+
+## 封面与链接兼容部署
+
+1. 上传 `customization/assets/covers/*.webp` 到 Halo 附件库。SVG 保留为编辑源，不为上传它而放宽服务端附件安全策略。
+2. 在文章列表的行操作 → 设置 → 封面图中选择对应附件并保存；这不需要打开缺失的 Markdown 编辑器，也不修改正文。
+3. Hao 主题设置 → 布局 → 随机封面改为 `https://aerospaceboy.site/upload/ab-cover-default-v1.webp?v=1`。保留查询参数，主题会追加 `&文章标题`，避免追加到文件路径导致 404。
+4. 在文章版权设置中使用 `customization/copyright.html`，保持原有许可名称。
+5. `config/site.json` 中的 `privacy_policy_path` 和 `default_cover_path` 会写入构建脚本并纳入哈希校验。重新生成、更新全局注入后，实际检查隐私入口和图片回退。
+6. 更新 `config/covers.json` 的实际上传 URL、字节数、SHA256，以及文章清单的封面路径。修改后的新素材必须重新上传；Git 推送不会更新附件。
+
+隐私修复限于评论区链接入口：Hao 1.7.3 固定的 `/privacy` 由兼容脚本改为 `/privacy-policy`。关闭 JavaScript 或直接请求旧路径仍会 404，正式主题修订或服务器重定向可以后续替代此兼容代码。当前隐私正文仍待根据实际服务完善。
+
+回退本轮时恢复 `backups/optimization-20261029/` 中全局注入、版权与随机封面值，将七篇文章封面还原为空；不必删除已上传附件。该私有目录未提交到 Git，不能替代完整 Halo 备份。

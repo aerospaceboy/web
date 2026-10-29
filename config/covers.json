@@ -1,0 +1,42 @@
+{
+  "stm32-dev-env": {
+    "url": "https://aerospaceboy.site/upload/ab-cover-stm32-dev-env-v1.webp",
+    "sha256": "4349dedecb5d3b4a1169e576db7c9b63c4592b7b744a0f3ac41928570a5f7057",
+    "bytes": 21340
+  },
+  "yolo-training-to-edge": {
+    "url": "https://aerospaceboy.site/upload/ab-cover-yolo-training-to-edge-v1.webp",
+    "sha256": "d22e72984aa8a1d0d7aee61d6aaecb53b28e3f8863fc904a4211e871894b49e8",
+    "bytes": 20194
+  },
+  "ros2-basics": {
+    "url": "https://aerospaceboy.site/upload/ab-cover-ros2-basics-v1.webp",
+    "sha256": "fb7968229c01856da00c6d10064556edaf589b4ab0e3a459bb3876c6d37e596c",
+    "bytes": 23540
+  },
+  "pid-control-intro": {
+    "url": "https://aerospaceboy.site/upload/ab-cover-pid-control-intro-v1.webp",
+    "sha256": "3be407ce6b796f3cfa0694e80228619128c59a9e98ed28b9fd9f36d8c1673412",
+    "bytes": 21218
+  },
+  "project-log-template": {
+    "url": "https://aerospaceboy.site/upload/ab-cover-project-log-template-v1.webp",
+    "sha256": "a7fbe8372444b355a434859fcf25c3ab7fe3126fa7b3d969734f76628c3bca4a",
+    "bytes": 18944
+  },
+  "study-roadmap": {
+    "url": "https://aerospaceboy.site/upload/ab-cover-study-roadmap-v1.webp",
+    "sha256": "0d739a2de6f6fb3e292bf1f2f9b476db3345683340b5ceae178d5687e1a8edb4",
+    "bytes": 22960
+  },
+  "contest-prep-template": {
+    "url": "https://aerospaceboy.site/upload/ab-cover-contest-prep-template-v1.webp",
+    "sha256": "e37bb0069bf72b81ced3b0d7b039b99baef6caf510fabdcf5eded9f2eea93dad",
+    "bytes": 24654
+  },
+  "default": {
+    "url": "https://aerospaceboy.site/upload/ab-cover-default-v1.webp",
+    "sha256": "038d36e8ffaca01ee373e0b019b7962f27ecce56140cd58145296b72ff71bb7e",
+    "bytes": 26238
+  }
+}

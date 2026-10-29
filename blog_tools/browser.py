@@ -57,8 +57,12 @@ class Browser:
                     lines = active_port.read_text().splitlines()
                     if lines and lines[0].isdigit():
                         port = int(lines[0])
-                        with urlopen(f"http://127.0.0.1:{port}/json/list", timeout=2) as response:
-                            tabs = json.load(response)
+                        try:
+                            with urlopen(f"http://127.0.0.1:{port}/json/list", timeout=2) as response:
+                                tabs = json.load(response)
+                        except (OSError, ValueError):
+                            time.sleep(0.1)
+                            continue
                         target = next((t for t in tabs if t.get("type") == "page"), None)
                         if target:
                             self.ws = websocket.create_connection(
@@ -100,9 +104,13 @@ class Browser:
             raise RuntimeError("Page navigation failed: " + result["errorText"])
         deadline = time.monotonic() + 20
         while time.monotonic() < deadline:
-            if self.evaluate("document.readyState === 'complete' && location.href !== 'about:blank'"):
+            frame = self.command("Page.getFrameTree").get("frameTree", {}).get("frame", {})
+            committed = not result.get("loaderId") or frame.get("loaderId") == result["loaderId"]
+            if committed and self.evaluate("document.readyState === 'complete' && location.href !== 'about:blank'"):
                 self.evaluate("Promise.race([document.fonts.ready.then(() => true), "
                               "new Promise(r => setTimeout(() => r(false), 2000))])", promise=True)
+                self.evaluate("new Promise(resolve => requestAnimationFrame(() => "
+                              "requestAnimationFrame(() => resolve(true))))", promise=True)
                 return
             time.sleep(0.1)
         raise RuntimeError("Page did not finish loading")
@@ -117,10 +125,17 @@ class Browser:
                       ";document.head.append(s); return true; })()")
 
     def screenshot(self, path):
-        result = self.command("Page.captureScreenshot", {"format": "png"})
+        path = Path(path)
+        extension = path.suffix.lower()
+        image_format = {".png": "png", ".webp": "webp", ".jpg": "jpeg", ".jpeg": "jpeg"}.get(extension)
+        if image_format is None:
+            raise ValueError("Screenshot output must use .png, .webp, .jpg, or .jpeg")
+        params = {"format": image_format}
+        if image_format != "png":
+            params["quality"] = 88
+        result = self.command("Page.captureScreenshot", params)
         if not result.get("data"):
             raise RuntimeError("Edge did not return a screenshot")
-        path = Path(path)
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(base64.b64decode(result["data"], validate=True))
 

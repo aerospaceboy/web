@@ -11,6 +11,26 @@
                 }
             };
         }
+        if (typeof rm !== 'undefined' && typeof rm.copyPageUrl !== 'function') {
+            rm.copyPageUrl = async function () {
+                const button = document.querySelector('.post-copyright-copybtn');
+                try {
+                    if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable');
+                    await navigator.clipboard.writeText(location.href);
+                    if (button) button.setAttribute('aria-label', '文章链接已复制');
+                    if (typeof btf !== 'undefined' && typeof btf.snackbarShow === 'function') {
+                        btf.snackbarShow('文章链接已复制', false, 2000);
+                    }
+                    return true;
+                } catch {
+                    if (button) {
+                        button.setAttribute('aria-label', '复制失败，请手动复制地址栏');
+                        button.title = '复制失败，请手动复制地址栏';
+                    }
+                    return false;
+                }
+            };
+        }
         // Escape calls this even when the loading-box setting is disabled.
         if (typeof heo !== 'undefined' && typeof heo.hideLoading === 'function' &&
             !heo.__abLoadingGuard) {
@@ -22,8 +42,47 @@
         }
     };
 
+    const repairPageControls = () => {
+        const config = window.__abPublicConfig || {};
+        const privacy = config.privacyPolicyPath;
+        if (privacy) {
+            for (const link of document.querySelectorAll('.comment-randomInfo a[href]')) {
+                const url = new URL(link.href, document.baseURI);
+                if (url.origin === location.origin && url.pathname === '/privacy') {
+                    link.setAttribute('href', privacy);
+                }
+            }
+        }
+        for (const button of document.querySelectorAll('.post-copyright-copybtn')) {
+            button.setAttribute('aria-label', '复制文章链接');
+            button.title = '复制文章链接';
+        }
+        for (const image of document.querySelectorAll('img.post_bg')) {
+            image.decoding = 'async';
+            if (image.dataset.abCoverGuard) continue;
+            image.dataset.abCoverGuard = 'true';
+            image.addEventListener('error', () => {
+                if (!config.defaultCoverPath) return;
+                const fallback = new URL(config.defaultCoverPath, document.baseURI);
+                if (image.src === fallback.href) return;
+                image.removeAttribute('data-lazy-src');
+                image.src = fallback.href;
+            }, {once: true});
+        }
+        const first = document.querySelector('#recent-posts img.post_bg');
+        if (first) {
+            const rect = first.getBoundingClientRect();
+            if (rect.top < innerHeight && rect.bottom > 0) {
+                first.loading = 'eager';
+                first.fetchPriority = 'high';
+                if (!first.getAttribute('src') && first.dataset.lazySrc) first.src = first.dataset.lazySrc;
+            }
+        }
+    };
+
     const install = () => {
         guardDisabledWidgets();
+        repairPageControls();
         const sidebar = document.querySelector('#sidebar-menus');
         const primary = document.querySelector('#menus');
         if (!sidebar || !primary) return;
