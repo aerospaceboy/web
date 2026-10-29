@@ -9,6 +9,10 @@ __pycache__/
 *.py[cod]
 .venv/
 venv/
+.cache/
+build/
+reports/
+backups/
 
 # Local credentials and environment files.
 .env

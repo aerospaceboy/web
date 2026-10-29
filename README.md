@@ -1,79 +1,89 @@
 # 半截的诗 · AerospaceBoy
 
-个人技术博客 [aerospaceboy.site](https://aerospaceboy.site/) 的主题定制、内容快照与页面检查资料。
+个人技术博客 [aerospaceboy.site](https://aerospaceboy.site/) 的主题定制、内容与维护工具。
 
-记录方向包括嵌入式、人工智能、ROS2 与机器人、FPGA、自动化和项目实践。
+仓库保存 Halo 博客的定制成果，未包含 Halo 核心源码、完整主题、数据库和附件，克隆后不能直接启动或完整恢复网站。
 
-## 仓库范围
+## 快速开始
 
-本仓库保存建站和定制过程中产生的资料。Halo 核心源码、完整主题模板、数据库、附件库及服务器部署配置未包含在此仓库中，因此克隆后不能直接启动或完整恢复网站。
-
-| 路径 | 内容 |
-| --- | --- |
-| `customization/` | 定制 CSS、主题审计、设置方案、页面文案与素材需求 |
-| `phase4-audit/` | Hao 主题元信息、设置表单与注解设置定义 |
-| `phase5-backup-20261024-215453/` | 分类、标签、菜单、系统基本设置和主题配置快照 |
-| `phase6-backup/` | 文章、独立页面、菜单和主题配置的后续快照 |
-| `phase7-before/` | 历史调整前截图及过程截图 |
-| `phase7-after/` | 历史调整后截图 |
-| `.make-posts.py` | 使用 Halo API 创建并发布七篇分类起始文章的脚本 |
-| `.cdp.py` | Edge CDP 页面横向溢出测量工具 |
-| `.cdp2.py` | Edge CDP 页面 JavaScript 检查工具 |
-| `.cdp-shot.py` | 指定视口的 Edge CDP 截图工具 |
-| `.shot*.sh` | Windows Git Bash 环境下的历史截图辅助脚本 |
-
-浏览器配置目录、Cookie、缓存、环境变量文件及下载的临时 CSS 不纳入版本管理。
-
-## 已核对的站点信息
-
-2026-10-29 通过公网只读请求检查：
-
-- 页面标识为 Halo **2.27.1**，主题资源版本为 Hao **1.7.3**。
-- 首页、归档、项目、关于、RSS 和 Sitemap 的 GET 请求正常。
-- 管理入口跳转登录页，健康检查返回 `UP`。
-- RSS 包含七篇文章，与首页文章数量一致。
-
-上述结果仅代表检查时刻的公网状态。历史部署文档记录了 Nginx、Docker 与 PostgreSQL，本次未登录服务器复核部署配置。
-
-## 使用定制资料
-
-主题方案从 `customization/hao-audit.md` 和 `customization/hao-settings-plan.md` 开始阅读。页面内容可参考 `about.md`、`projects.md`，图片规格见 `assets-needed.md`。
-
-这些文件包含不同阶段的计划与历史状态。实际线上内容可能已更新，不应直接用旧快照覆盖线上配置。`settings.yaml` 是主题设置表单定义，其中的默认值不能代表实际生效配置。
-
-`aerospaceboy-custom.css` 记录了通过首页 Banner HTML 注入样式的历史做法。公网检查发现对应样式块只出现在首页，项目页、关于页与抽查文章页未包含该块；后续应将需要全站生效的规则迁入统一加载入口。
-
-## 检查脚本
-
-CDP 工具需要 Windows、Microsoft Edge、Python 3 和提供 `websocket` 模块的 `websocket-client` 包。使用项目虚拟环境安装依赖：
+需要 Python 3.11 或更新版本。以下命令只创建项目环境，不修改系统 Python 或 PATH：
 
 ```powershell
 python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install websocket-client
-.\.venv\Scripts\python.exe .\.cdp.py https://aerospaceboy.site/ 390 844
-.\.venv\Scripts\python.exe .\.cdp-shot.py https://aerospaceboy.site/ 390 844 home-390.png
+.\.venv\Scripts\python.exe -m pip install --cache-dir .cache/pip -r requirements.txt
+.\.venv\Scripts\python.exe -m unittest discover -s tests -v
+.\.venv\Scripts\python.exe .make-posts.py --dry-run
+.\.venv\Scripts\python.exe -m blog_tools.build
 ```
 
-脚本中的 Edge 路径、9333–9335 调试端口和启动方式来自原开发环境，运行前需要核对。截图脚本会启动独立的无头浏览器并在本地写入图片和配置目录。`.shot*.sh` 还包含原机器的绝对路径，不是通用启动器。
+Linux 对应使用 `.venv/bin/python`。浏览器检查另外需要 Microsoft Edge，可用 `EDGE_PATH` 指定路径。
 
-## 文章发布脚本的边界
+## 目录
 
-`.make-posts.py` 从环境变量 `HALO_PAT` 读取凭据，并向线上站点发送创建、保存正文和发布请求。仓库不保存 PAT。
+| 路径 | 内容 |
+| --- | --- |
+| `blog_tools/` | Halo 请求、文章发布、样式构建、公网审计和 CDP 浏览器工具 |
+| `config/site.json` | 站点域名、作者、首页与关于页描述，不保存凭据 |
+| `content/posts.json`、`content/posts/` | 七篇分类起始文章的清单与独立 Markdown 正文 |
+| `customization/` | 当前 CSS，以及历史定制方案、页面文案与素材需求 |
+| `docs/` | 当前维护状态、部署步骤和备份恢复边界 |
+| `tests/` | 失败发布、重复运行、断连、HTTP 传输、内容与构建回归检查 |
+| `.github/workflows/checks.yml` | Windows/Linux、Python 3.11/3.12 的离线检查 |
+| `phase4-audit/` | 原始主题元信息与设置表单定义 |
+| `phase5-backup-*`、`phase6-backup/` | 历史配置与内容快照 |
+| `phase7-before/`、`phase7-after/` | 历史截图，不代表当前页面状态 |
 
-该脚本保留原始实现，尚缺少以下能力：
+生成的 `build/`、`reports/`、浏览器临时配置、`.venv/`、私有备份和凭据文件均被 Git 忽略。
 
-- 正文保存成功后才允许发布的严格判断。
-- 按 slug 检查已有文章与重复执行保护。
-- 对创建请求重试后的结果确认。
-- 发布后回读验证和完整成功统计。
-- 域名、作者、分类与标签 ID 的可移植配置。
+## 发布文章
 
-不要把它作为只读检查脚本执行；修复这些问题并核对目标站点后，再用于实际发布。
+默认调用与 `--dry-run` 均为离线计划，不读取 PAT、不访问站点、不发布内容。可以用 `--config` 和 `--manifest` 指定不同站点与文章清单。
 
-## 验证与后续工作
+实际发布需要在当前进程环境设置 `HALO_PAT`，再执行：
 
-入库前完成四个 Python 文件的语法解析、23 个 JSON 文件的可解析检查，以及待上传文本的常见凭据模式扫描。未执行文章发布脚本，未修改线上数据。历史截图不代表当前移动端交互或完整视觉验收。
+```powershell
+.\.venv\Scripts\python.exe .make-posts.py --apply
+```
 
-建议后续完善全站样式加载、关于页 SEO 摘要、发布脚本可靠性、当前截图与服务器恢复文档，并持续补充带代码和实测结果的项目案例。
+请在本机私下设置凭据，不要提交到 Git 或粘贴进聊天。
 
-主题元信息及相关资源保留其原作者信息。原主题的许可证与使用条件以其上游项目为准。
+发布工具先解析目标站点全部分类和标签，按 slug 找到资源 ID。所有清单和分类引用检查通过后才开始写入。已有文章会跳过；本工具创建但未完成的草稿可以恢复，其余草稿保持原样。
+
+写请求不自动重试。创建响应丢失时按确定性名称回读；正文回读一致后才发布指定快照，发布后的正文再回读一致才计入成功。任何失败都会出现在 `failed` 中并使进程返回非零退出码。
+
+这不等于数据库事务：正文失败可能留下未发布草稿；发布请求响应丢失或发布后验证失败时，文章可能已上线，需要核对报告。并发编辑和本工具之间不提供跨客户端锁，已有正式文章的更新仍应在 Halo 后台进行。
+
+## 全站样式和 SEO
+
+```powershell
+.\.venv\Scripts\python.exe -m blog_tools.build
+```
+
+生成 `build/global-head.html` 和首页、关于页描述文件。全局文件包含 CSS 与手机导航兼容脚本，按 [部署步骤](docs/deployment.md) 合并到 Halo **设置 → 代码注入 → 全局 head 标签**，同时移除首页 Banner 中的旧定制样式块，并修正 SEO 与页面摘要。
+
+GitHub 推送与生成文件不会自动修改线上配置。
+
+```powershell
+.\.venv\Scripts\python.exe -m blog_tools.audit --output reports/live-audit.json
+```
+
+公网审计会核对全站样式标识、CSS 版本、首页及关于页描述、RSS 和 Sitemap。HTTP 200 但样式或摘要不正确时，仍然报告失败。
+
+## 浏览器检查
+
+```powershell
+.\.venv\Scripts\python.exe .cdp.py https://aerospaceboy.site/ 390 844 --check
+.\.venv\Scripts\python.exe .cdp-shot.py https://aerospaceboy.site/ 390 844 reports/home-390.png
+.\.venv\Scripts\python.exe .cdp.py https://aerospaceboy.site/archives/pid-control-intro 390 844 --inject-css customization/aerospaceboy-custom.css --check
+.\.venv\Scripts\python.exe -m blog_tools.check_navigation
+```
+
+`--inject-css` 用于隔离浏览器预览，会在本地文档移除旧定制样式并添加新 CSS；不会修改服务器。桌面和移动视口分别设置设备参数，每次运行使用独立配置目录与动态调试端口，不复用个人浏览器登录状态。
+
+`.cdp2.py` 保留页面表达式检查入口。`.shot*.sh` 保留 Git Bash 截图兼容入口，结果写到 `reports/screenshots/`，不覆盖历史截图；旧亮度阈值不再作为验收标准。
+
+## 状态与恢复
+
+当前维护情况见 [status.md](docs/status.md)。完整恢复需要 Halo 备份、数据库、附件及实际部署资料，见 [recovery.md](docs/recovery.md)；历史 JSON 不能代替恢复演练。
+
+主题元信息和相关资料保留原作者信息，原主题使用条件以其上游项目为准。

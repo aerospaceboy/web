@@ -1,0 +1,67 @@
+[
+  {
+    "slug": "stm32-dev-env",
+    "title": "STM32 开发环境搭建与最小工程思路",
+    "category": "embedded",
+    "tags": [
+      "stm32",
+      "c-cpp"
+    ],
+    "file": "posts/stm32-dev-env.md"
+  },
+  {
+    "slug": "yolo-training-to-edge",
+    "title": "YOLO 模型从训练到边缘部署的流程梳理",
+    "category": "ai",
+    "tags": [
+      "yolo",
+      "python",
+      "computer-vision"
+    ],
+    "file": "posts/yolo-training-to-edge.md"
+  },
+  {
+    "slug": "ros2-basics",
+    "title": "ROS2 入门笔记：节点、话题、服务与动作",
+    "category": "robotics",
+    "tags": [
+      "ros2",
+      "linux",
+      "python"
+    ],
+    "file": "posts/ros2-basics.md"
+  },
+  {
+    "slug": "pid-control-intro",
+    "title": "PID 控制入门笔记：从公式到代码",
+    "category": "automation",
+    "tags": [
+      "python"
+    ],
+    "file": "posts/pid-control-intro.md"
+  },
+  {
+    "slug": "project-log-template",
+    "title": "项目记录模板：从立项到复盘",
+    "category": "project-log",
+    "tags": [],
+    "file": "posts/project-log-template.md"
+  },
+  {
+    "slug": "study-roadmap",
+    "title": "从嵌入式到 AI：一条可执行的学习路线索引",
+    "category": "study-notes",
+    "tags": [
+      "c-cpp",
+      "python"
+    ],
+    "file": "posts/study-roadmap.md"
+  },
+  {
+    "slug": "contest-prep-template",
+    "title": "竞赛备赛流程模板",
+    "category": "contest-log",
+    "tags": [],
+    "file": "posts/contest-prep-template.md"
+  }
+]

@@ -1,7 +1,8 @@
 /* ============================================================
-   aerospaceboy 定制样式 (Phase 7)
-   注入方式：Hao 主题设置 → 顶部 → Banner → 大标题（HTML 字段）
-   <style> 块随配置保存，升级 Hao 后配置不丢；无需改主题源码。
+   aerospaceboy 全站定制样式
+   运行 python -m blog_tools.build，生成 build/global-head.html。
+   将其合并到 Halo 设置 → 代码注入 → 全局 head 标签。
+   从 Banner HTML 删除旧样式块，保留原有品牌内容。
    设计方向：深空 / 工程感 / 克制动画
    ============================================================ */
 
@@ -11,6 +12,16 @@
     --ab-border: 1px solid rgba(255, 255, 255, .07);
     --ab-shadow: 0 4px 18px rgba(0, 0, 0, .22);
     --ab-lift: -3px;
+    --ab-card-bg: rgba(255, 255, 255, .02);
+    --ab-profile-bg: #12161c;
+    --ab-profile-gradient: linear-gradient(160deg, #151b26 0%, #0d1015 70%);
+}
+[data-theme="light"] {
+    --ab-border: 1px solid rgba(0, 0, 0, .12);
+    --ab-shadow: 0 4px 18px rgba(0, 0, 0, .08);
+    --ab-card-bg: rgba(0, 0, 0, .02);
+    --ab-profile-bg: #f5f7fa;
+    --ab-profile-gradient: linear-gradient(160deg, #eef2f7, #fff);
 }
 
 /* ---------- Hero：品牌层级 ---------- */
@@ -61,13 +72,13 @@
    主题用 #aside-content > .card-widget.card-info::before 画 15s 循环渐变动画，
    这里改为静态深空渐变并停掉动画（减少合成开销，符合克制动效原则）。 */
 #aside-content > .card-widget.card-info::before {
-    background: linear-gradient(160deg, #151b26 0%, #0d1015 70%) !important;
+    background: var(--ab-profile-gradient) !important;
     background-size: 100% 100% !important;
     animation: none !important;
 }
 #aside-content .card-info .card-content {
     background-image: none !important;
-    background-color: #12161c;
+    background-color: var(--ab-profile-bg);
 }
 
 /* ---------- 分类栏：隐藏"默认分类"入口（分类资源保留） ---------- */
@@ -78,7 +89,7 @@
 /* ---------- Projects 视觉卡片 ---------- */
 .ab-proj-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
     gap: 14px;
     margin: 1.2em 0;
 }
@@ -86,7 +97,7 @@
     border: var(--ab-border);
     border-radius: var(--ab-radius);
     padding: 18px 18px 16px;
-    background: rgba(255, 255, 255, .02);
+    background: var(--ab-card-bg);
     transition: transform .2s ease, border-color .2s ease;
 }
 .ab-proj-card:hover {
@@ -148,6 +159,21 @@
 #article-container {
     font-size: 16.5px;
     line-height: 1.85;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+#article-container :is(img, video, iframe) {
+    max-width: 100%;
+}
+#article-container pre {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-wrap: normal;
+}
+#article-container table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
 }
 #article-container p {
     margin: 0 0 1.1em;
@@ -175,10 +201,13 @@
 }
 
 /* ---------- Empty State：首页无文章时 ---------- */
-#recent-posts:not(:has(.recent-post-item)) #pagination {
+#bbTimeList:not(:has(.swiper-slide)) {
     display: none;
 }
-#recent-posts:not(:has(.recent-post-item))::after {
+body:has(#home_top) #recent-posts:not(:has(.recent-post-item)) #pagination {
+    display: none;
+}
+body:has(#home_top) #recent-posts:not(:has(.recent-post-item))::after {
     content: "这里还没有正式文章，新的技术记录正在路上。";
     display: block;
     width: 100%;
@@ -190,17 +219,79 @@
 }
 
 /* ---------- Mobile 精修 ---------- */
+#ab-mobile-navigation {
+    display: none;
+}
 @media (max-width: 768px) {
-    /* 横向溢出防护：分类栏为横向滚动条，页面本体不产生横向滚动 */
-    html,
-    body {
-        overflow-x: hidden;
+    #ab-mobile-navigation {
+        display: block;
+        margin-bottom: 16px;
     }
-    #recent-posts {
-        overflow-x: hidden;
+    .ab-mobile-nav-links {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+    .ab-mobile-nav-links a {
+        display: flex;
+        align-items: center;
+        min-height: 44px;
+        padding: 8px 12px;
+        border: var(--ab-border);
+        border-radius: 10px;
+        color: inherit;
+        background: var(--ab-card-bg);
+    }
+    .ab-mobile-nav-links a:focus-visible {
+        outline: 2px solid currentColor;
+        outline-offset: 2px;
+    }
+    /* 手机端保留两个主要入口，文章从下方列表阅读，减少首屏重复内容。 */
+    #home_top #topGroup {
+        display: none;
+    }
+    #home_top #recent-post-top {
+        height: auto;
+        overflow: visible;
+        margin-bottom: 0;
+    }
+    #home_top #bannerGroup {
+        width: 100%;
+        margin: 0;
+    }
+    #home_top .categoryGroup {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        width: 100%;
+        min-width: 0 !important;
+        max-height: none;
+        margin: 0;
+    }
+    #home_top .categoryItem {
+        height: 56px;
+    }
+    #home_top a.categoryButton {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 12px;
+        font-size: 16px;
+        line-height: 1.4;
+    }
+    /* 保留可滚动内容，通过约束布局和长内容处理溢出。 */
+    .layout,
+    #recent-posts,
+    #article-container {
+        min-width: 0;
+        max-width: 100%;
+    }
+    #category-bar-items {
+        min-width: 0;
+        overflow-x: auto;
     }
     /* Hao 在 ≤768px 隐藏整块 Banner，此处补一行紧凑品牌标识 */
-    #recent-posts::before {
+    body:has(#home_top) #recent-posts::before {
         content: "半截的诗 · aerospaceboy";
         display: block;
         text-align: center;
@@ -233,7 +324,7 @@
         height: auto;
     }
     /* 空状态文案在窄屏换行 */
-    #recent-posts:not(:has(.recent-post-item))::after {
+    body:has(#home_top) #recent-posts:not(:has(.recent-post-item))::after {
         max-width: 88%;
         margin: 0 auto;
         padding: 40px 0 32px;
@@ -245,11 +336,14 @@
 @media (prefers-reduced-motion: reduce) {
     .card-widget,
     .recent-post-item,
-    .ab-tech-tags span {
+    .ab-tech-tags span,
+    .ab-proj-card,
+    .tags-group-icon {
         transition: none !important;
     }
     .card-widget:hover,
-    .recent-post-item:hover {
+    .recent-post-item:hover,
+    .ab-proj-card:hover {
         transform: none;
     }
 }

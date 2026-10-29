@@ -1,38 +1,28 @@
-# SEO 基础配置方案（Console 手工执行清单）
+# SEO 配置方案（2026-10-29 修订）
 
-> 站点级标题/Logo/Favicon 属于 Halo Core 系统设置，不是主题文件，必须在 Console 改。
-> 本文件只给建议值，不写数据库。
+此前 Phase 4 文档将“基本设置里没有 description 输入框”误写成站点没有全局描述能力。Halo 的描述设置实际在 **设置 → SEO 设置**，本修订替代旧方案。
 
-## 1. Console → 设置 → 基本设置
+## 首页描述
 
-| 设置项 | 当前值 | 建议值 | 状态 |
-|---|---|---|---|
-| 站点标题 | 半截的诗 | 半截的诗 | ✅ 已设置 |
-| 副标题 | （待确认） | AerospaceBoy | 需确认/修改 |
-| Logo | （待确认） | 上传自己的 logo 图 | 需上传 |
-| Favicon | （待确认） | 上传自己的 favicon | 需上传 |
+在 `config/site.json` 维护 `site_description`，运行 `python -m blog_tools.build` 后，将 `build/site-description.txt` 内容保存到 Halo 设置 → SEO 设置 → 站点描述。
 
-## 2. 站点描述与关键词
+预期正文：记录嵌入式、人工智能、机器人、自动化与项目开发中的学习和实践。
 
-Halo 2.27 基本设置没有全局 description/keywords 输入框，
-建议按以下方式落地（均为官方能力）：
+SEO 描述作用于首页，其他页面根据各自内容和摘要生成。站点关键词字段可按实际需求填写，但主流搜索引擎不再把它作为主要关键词信号，无需为了本次修复新增插件。
 
-| 内容 | 建议值 | 落地方式 |
-|---|---|---|
-| 站点描述 | 记录嵌入式、人工智能、机器人、自动化与项目开发。 | 1) 每篇文章写好摘要（excerpt），Feed/Sitemap 会输出；2) 主题设置 → 关于 → profileDesc / 首页 Banner 小标题承载展示层 |
-| Keywords | 嵌入式, AI, 人工智能, ROS2, FPGA, YOLO, Orange Pi, 自动化, 机器人 | 用**文章标签**承载（见 tags 清单），搜索引擎通过 /tags 与标签页聚合收录 |
-| Open Graph 默认图 | 一张 16:9 星空/科技图 | 主题设置 → 其他设置 → Open Graph → image |
-| Sitemap | 已启用 | PluginSitemap → /sitemap.xml（已验证 200） |
-| RSS | 已启用 | PluginFeed → /rss.xml（已验证 200） |
+## 关于页摘要
 
-## 3. 文章写作 SEO 习惯（后续）
+编辑 `/about` 页面，关闭摘要自动生成，改用 `build/about-excerpt.txt` 的手写描述并保存发布。保留现有正文。
 
-- 文章设置封面图（避免落到随机图源）
-- 设置分类（嵌入式/AI/机器人/自动化/项目记录/学习笔记/比赛记录）+ 2~5 个标签
-- 摘要（excerpt）手写一两句，Feed 和分享卡片质量更高
-- 自定义别名 slug 用英文（如 `stm32-uart-dma`），URL 更友好
+必须核对服务端 HTML 的 `description` 和 `og:description` 都已更新，不能只检查页面可见正文。
 
-## 4. 无需购买/安装的东西
+## 分享图和文章
 
-- 不需要额外 SEO 插件：Sitemap + Feed 已覆盖搜索引擎抓取入口
-- 不需要统计平台（性能约束）：如后续要统计，主题支持 51la（about.LingQueMonitorID），体量轻
+- Logo、Favicon、默认分享图仍按 `assets-needed.md` 准备，上传后填写真实附件地址。
+- 每篇文章的分类、标签和封面应与实际内容匹配。
+- 项目案例只添加已经核实的代码、演示和实测数据。
+- RSS 与 Sitemap 保留现有插件，通过公网 XML 请求检查，不根据插件文件是否存在判断是否生效。
+
+完整部署与回退步骤见 `../docs/deployment.md`。
+
+[官方依据：Halo 站点设置](https://docs.halo.run/guide/use/settings)
