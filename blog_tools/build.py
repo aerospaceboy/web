@@ -14,7 +14,8 @@ NAV_ID = "aerospaceboy-mobile-navigation-script"
 
 def navigation_source(config):
     settings = {"privacyPolicyPath": config.get("privacy_policy_path", "/privacy-policy"),
-                "defaultCoverPath": config.get("default_cover_path", "")}
+                "defaultCoverPath": config.get("default_cover_path", ""),
+                "nebulaBackgroundPath": config.get("nebula_background_path", "")}
     for value in settings.values():
         if value and (not isinstance(value, str) or not value.startswith("/") or
                       value.startswith("//") or any(c in value for c in "\r\n<>\\")):

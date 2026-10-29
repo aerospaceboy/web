@@ -25,11 +25,15 @@
             hero.setAttribute('aria-labelledby', 'ab-space-title');
             // Static, repository-owned markup; page text is assigned separately.
             hero.innerHTML = `
-                <div class="ab-hero-grid" aria-hidden="true"></div>
+                <div class="ab-nebula-scene" aria-hidden="true">
+                    <img class="ab-nebula-image" alt="" decoding="async" fetchpriority="high">
+                    <svg class="ab-starfield" viewBox="0 0 1200 500" preserveAspectRatio="xMidYMid slice" focusable="false"></svg>
+                    <span class="ab-shooting-star"></span>
+                </div>
                 <div class="ab-hero-copy">
-                    <p class="ab-hero-eyebrow"><span></span> AEROSPACEBOY / EXPLORATION LOG</p>
+                    <p class="ab-hero-eyebrow"><span></span> AEROSPACEBOY · UNDER THE STARS</p>
                     <h1 id="ab-space-title"></h1>
-                    <p class="ab-hero-english">Build beyond <span>the ordinary.</span></p>
+                    <p class="ab-hero-english">写代码，<span>也仰望星空。</span></p>
                     <p class="ab-hero-description"></p>
                     <div class="ab-hero-actions">
                         <a class="ab-hero-primary" href="/projects">探索项目 <span aria-hidden="true">↗</span></a>
@@ -40,42 +44,32 @@
                         <a href="/categories/robotics">Robotics</a><a href="/tags/fpga">FPGA</a>
                     </div>
                 </div>
-                <div class="ab-orbit-art" aria-hidden="true">
-                    <svg viewBox="0 0 460 400" focusable="false">
-                        <defs>
-                            <radialGradient id="ab-planet-fill"><stop stop-color="#224e6e"/><stop offset=".7" stop-color="#0c253c"/><stop offset="1" stop-color="#071322"/></radialGradient>
-                            <linearGradient id="ab-orbit-line"><stop stop-color="#6de2db" stop-opacity=".1"/><stop offset=".5" stop-color="#6de2db"/><stop offset="1" stop-color="#879bff" stop-opacity=".25"/></linearGradient>
-                        </defs>
-                        <g class="ab-orbit-guide" fill="none" stroke="currentColor">
-                            <circle cx="230" cy="200" r="174" stroke-dasharray="2 10"/>
-                            <path d="M230 10v24m0 332v24M36 200h24m340 0h24"/>
-                            <circle cx="230" cy="200" r="148" opacity=".25"/>
-                        </g>
-                        <g class="ab-planet">
-                            <circle cx="230" cy="200" r="102" fill="url(#ab-planet-fill)" stroke="#6de2db" stroke-opacity=".5"/>
-                            <g fill="none" stroke="#6de2db" stroke-opacity=".25">
-                                <ellipse cx="230" cy="200" rx="102" ry="38"/><ellipse cx="230" cy="200" rx="102" ry="73"/>
-                                <ellipse cx="230" cy="200" rx="38" ry="102"/><ellipse cx="230" cy="200" rx="73" ry="102"/>
-                                <path d="M128 200h204M230 98v204"/>
-                            </g>
-                        </g>
-                        <g class="ab-orbit-track" fill="none" stroke="url(#ab-orbit-line)" stroke-width="1.5">
-                            <ellipse cx="230" cy="200" rx="194" ry="66" transform="rotate(-30 230 200)"/>
-                            <ellipse cx="230" cy="200" rx="161" ry="119" transform="rotate(42 230 200)" opacity=".5"/>
-                        </g>
-                        <g class="ab-orbit-satellite"><circle cx="398" cy="102" r="5" fill="#a5fff0"/><circle cx="398" cy="102" r="11" fill="none" stroke="#6de2db" stroke-opacity=".35"/></g>
-                        <g fill="#a5c3d8" font-family="monospace" font-size="10" letter-spacing="2">
-                            <text x="31" y="51">IDEAS IN ORBIT</text><text x="289" y="363">KEEP EXPLORING</text>
-                        </g>
-                    </svg>
-                    <span class="ab-orbit-label ab-orbit-label-one">01 / HARDWARE</span>
-                    <span class="ab-orbit-label ab-orbit-label-two">02 / INTELLIGENCE</span>
-                    <span class="ab-orbit-core">A<span>✦</span></span>
-                </div>
-                <div class="ab-hero-footer"><span>CODE · HARDWARE · COSMOS</span><span>持续探索，持续构建 <i aria-hidden="true">↗</i></span></div>`;
+                <div class="ab-hero-footer"><span>CODE · HARDWARE · STARRY NIGHTS</span><span>持续探索，持续构建 <i aria-hidden="true">↗</i></span></div>`;
             hero.querySelector('h1').textContent = home.querySelector('.banners-title-big')?.textContent.trim() || '半截的诗';
             const source = home.querySelector('.banners-title-small');
             hero.querySelector('.ab-hero-description').textContent = source?.firstChild?.textContent.trim() || '在代码、硬件与星空之间，记录每一次探索。';
+            const background = window.__abPublicConfig?.nebulaBackgroundPath;
+            const image = hero.querySelector('.ab-nebula-image');
+            image.addEventListener('error', () => image.remove(), {once: true});
+            if (background) image.src = background;
+            else image.remove();
+            // A small, deterministic decorative field; these are not sky coordinates.
+            let seed = 72931;
+            const random = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+            const svg = hero.querySelector('.ab-starfield');
+            for (let layer = 0; layer < 2; layer++) {
+                const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                group.setAttribute('class', 'ab-stars-depth-' + layer);
+                for (let i = 0; i < 75; i++) {
+                    const star = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    star.setAttribute('cx', (random() * 1200).toFixed(1));
+                    star.setAttribute('cy', (random() * 500).toFixed(1));
+                    star.setAttribute('r', (.25 + Math.pow(random(), 4) * 1.1).toFixed(2));
+                    star.setAttribute('opacity', (.15 + random() * .55).toFixed(2));
+                    group.append(star);
+                }
+                svg.append(group);
+            }
             home.prepend(hero);
             hero.addEventListener('pointermove', event => {
                 if (reduced.matches || !finePointer.matches || navigator.connection?.saveData || frame) return;
@@ -99,16 +93,16 @@
         activeHero = hero;
         if ('IntersectionObserver' in window) {
             observer = new IntersectionObserver(entries => {
-                for (const entry of entries) entry.target.classList.toggle('ab-orbit-paused', document.hidden || !entry.isIntersecting);
+                for (const entry of entries) entry.target.classList.toggle('ab-sky-paused', document.hidden || !entry.isIntersecting);
             });
             observer.observe(hero);
         }
-        hero.classList.toggle('ab-orbit-paused', document.hidden);
+        hero.classList.toggle('ab-sky-paused', document.hidden);
     };
     document.addEventListener('visibilitychange', () => {
         if (activeHero) {
             const rect = activeHero.getBoundingClientRect();
-            activeHero.classList.toggle('ab-orbit-paused', document.hidden || rect.bottom <= 0 || rect.top >= innerHeight);
+            activeHero.classList.toggle('ab-sky-paused', document.hidden || rect.bottom <= 0 || rect.top >= innerHeight);
         }
     });
     window.__abInstallSpaceHero = install;

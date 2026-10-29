@@ -86,3 +86,13 @@
 增强区只在存在 `#home_top` 时创建，复制已有品牌名和描述文本；不修改原始 Banner 配置。手机、浅色和减弱动效规则均在统一 CSS 中。若 Halo 更换主题结构，应先检查选择器；脚本未成功生成新品牌区时旧 Banner 保持可见。
 
 本轮回退：恢复私有 `backups/orbit-20261029/global-head.html`，再刷新页面确认原首页和既有封面恢复。该文件只是本轮代码注入备份，不是数据库或完整站点备份。
+
+## 当前星云素材部署
+
+先上传 `customization/assets/nebula/ab-nebula-night-v1.webp` 到 Halo 附件库，确认实际 URL、大小与 SHA256，再更新 `config/site.json` 的 `nebula_background_path` 和 `config/visual-assets.json`。PNG 保留为编辑源，线上不引用 PNG。
+
+重新构建并更新全局 CSS/组合脚本。背景路径会编译到运行时配置并纳入脚本哈希。公网审计会下载封面与视觉素材逐一核验；浏览器还须确认 `.ab-nebula-image` 加载成功、标题与按钮可读、手机未横向溢出。
+
+浅色模式的主视觉有意保留深色夜空与白字；其余区域仍随主题切换。切勿仅把主视觉文字变黑而沿用深色图片。
+
+本轮回退恢复 `backups/nebula-20261029/global-head.html`。已上传但不再引用的背景可保留，不必为回退删除附件。

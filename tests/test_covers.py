@@ -10,6 +10,15 @@ from blog_tools.publish import ROOT, load_posts
 
 
 class CoverTests(unittest.TestCase):
+    def test_nebula_deployment_record_matches_export(self):
+        records = json.loads((ROOT / 'config/visual-assets.json').read_text(encoding='utf-8'))
+        record = records['nebula-night']
+        data = (ROOT / 'customization/assets/nebula/ab-nebula-night-v1.webp').read_bytes()
+        self.assertEqual(hashlib.sha256(data).hexdigest(), record['sha256'])
+        self.assertEqual(len(data), record['bytes'])
+        self.assertEqual(data[:4], b'RIFF')
+        self.assertEqual(data[8:12], b'WEBP')
+
     def test_deployment_manifest_matches_committed_exports_and_post_covers(self):
         covers = json.loads((ROOT / 'config/covers.json').read_text(encoding='utf-8'))
         for slug, record in covers.items():

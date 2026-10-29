@@ -52,7 +52,7 @@ def main():
             server.shutdown()
             server.server_close()
             worker.join()
-    print(json.dumps({"ok": True, "scenarios": ["flat_and_mixed_menu", "repeat_pjax", "menu_update", "native_menu_recovery", "theme_toggle", "disabled_widgets", "native_loading_preserved", "privacy_link", "copy_success", "copy_denied", "visible_cover_priority", "cover_fallback", "space_hero_pjax", "space_hero_page_exit", "space_hero_reduced_motion", "space_hero_light_mode"]}))
+    print(json.dumps({"ok": True, "scenarios": ["flat_and_mixed_menu", "repeat_pjax", "menu_update", "native_menu_recovery", "theme_toggle", "disabled_widgets", "native_loading_preserved", "privacy_link", "copy_success", "copy_denied", "visible_cover_priority", "cover_fallback", "space_hero_pjax", "space_hero_page_exit", "space_hero_reduced_motion", "space_hero_light_mode", "nebula_image_fallback", "light_profile_contrast"]}))
 
 
 def run_browser_checks(port):
@@ -96,10 +96,15 @@ def run_browser_checks(port):
         browser.evaluate("document.dispatchEvent(new Event('pjax:complete'));window.__abInstallSpaceHero();true")
         hero = browser.evaluate("({count:document.querySelectorAll('#ab-space-hero').length,title:document.querySelector('#ab-space-title').textContent,description:document.querySelector('.ab-hero-description').textContent,original:getComputedStyle(document.querySelector('#recent-top-post-group')).display,paths:[...document.querySelectorAll('.ab-hero-actions a')].map(a=>new URL(a.href).pathname),buttons:[...document.querySelectorAll('.ab-hero-actions a')].every(a=>a.getBoundingClientRect().height>=44)})")
         assert hero == {'count': 1, 'title': '测试品牌', 'description': '测试描述', 'original': 'none', 'paths': ['/projects', '/archives'], 'buttons': True}, hero
+        assert browser.evaluate("document.querySelectorAll('.ab-starfield circle').length") == 150
+        browser.evaluate("document.querySelector('.ab-nebula-image')?.dispatchEvent(new Event('error'));true")
+        assert browser.evaluate("document.querySelectorAll('.ab-nebula-image').length") == 0
         browser.command('Emulation.setEmulatedMedia', {'features': [{'name': 'prefers-reduced-motion', 'value': 'reduce'}]})
-        assert browser.evaluate("getComputedStyle(document.querySelector('.ab-orbit-track')).animationName") == 'none'
+        assert browser.evaluate("getComputedStyle(document.querySelector('.ab-stars-depth-0')).animationName") == 'none'
         browser.evaluate("document.documentElement.dataset.theme='light';true")
-        assert browser.evaluate("getComputedStyle(document.querySelector('#ab-space-hero')).color") == 'rgb(23, 43, 66)'
+        assert browser.evaluate("getComputedStyle(document.querySelector('#ab-space-hero')).color") == 'rgb(244, 241, 255)'
+        browser.evaluate("document.documentElement.style.setProperty('--heo-white','white');document.body.insertAdjacentHTML('beforeend','<aside id=\"aside-content\"><div class=\"card-info\"><span class=\"author-info__name\" style=\"color:var(--heo-white)\">个人卡片</span></div></aside>');true")
+        assert browser.evaluate("getComputedStyle(document.querySelector('.author-info__name')).color") == 'rgb(47, 41, 64)'
         browser.evaluate("document.querySelector('#home_top').remove();document.dispatchEvent(new Event('pjax:complete'));true")
         assert browser.evaluate("document.querySelectorAll('#ab-space-hero').length") == 0
 

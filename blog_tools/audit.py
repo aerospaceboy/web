@@ -168,7 +168,12 @@ def audit(config):
     with ThreadPoolExecutor(max_workers=4) as pool:
         results = list(pool.map(check, paths))
     assets = []
-    if covers is not None:
+    asset_records = dict(covers or {})
+    visual_assets_path = ROOT / 'config/visual-assets.json'
+    if visual_assets_path.exists():
+        visual_assets = json.loads(visual_assets_path.read_text(encoding='utf-8-sig'))
+        asset_records.update({'visual/' + key: value for key, value in visual_assets.items()})
+    if asset_records:
         def check_asset(item):
             slug, record = item
             if urlsplit(record['url']).netloc != urlsplit(base).netloc:
@@ -183,7 +188,7 @@ def audit(config):
             except (HTTPError, URLError, OSError):
                 return {'slug': slug, 'ok': False, 'error': 'asset_request_failed'}
         with ThreadPoolExecutor(max_workers=4) as pool:
-            assets = list(pool.map(check_asset, covers.items()))
+            assets = list(pool.map(check_asset, asset_records.items()))
     return {"target": base, "ok": all(not result["issues"] for result in results) and all(a['ok'] for a in assets),
             "pages": results, "assets": assets}
 
