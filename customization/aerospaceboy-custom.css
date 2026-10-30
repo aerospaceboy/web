@@ -270,6 +270,10 @@ body:has(#home_top) #recent-posts:not(:has(.recent-post-item))::after {
 .ab-mobile-nav-links a {
     display: flex;align-items: center;min-height: 44px;padding: 8px 12px;
     border: var(--ab-border);border-radius: 10px;color: inherit;background: var(--ab-card-bg);
+    transition: background-color .16s ease,border-color .16s ease,color .16s ease;
+}
+.ab-mobile-nav-links a:is(:hover, :focus-visible, :active) {
+    background: #d7c4fa;border-color: #d7c4fa;color: #24172e;
 }
 .ab-mobile-nav-links a:focus-visible { outline: 2px solid currentColor;outline-offset: 2px; }
 /* ---------- Mobile 精修 ---------- */
