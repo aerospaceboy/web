@@ -54,7 +54,7 @@ def main():
             server.shutdown()
             server.server_close()
             worker.join()
-    print(json.dumps({"ok": True, "scenarios": ["flat_and_mixed_menu", "repeat_pjax", "menu_update", "native_menu_recovery", "theme_toggle", "disabled_widgets", "native_loading_preserved", "privacy_link", "copy_success", "copy_denied", "visible_cover_priority", "cover_fallback", "space_hero_pjax", "space_hero_page_exit", "space_hero_reduced_motion", "space_hero_light_mode", "nebula_image_fallback", "light_profile_contrast", "pointer_tracks_and_trails", "pointer_click_through", "pointer_pjax_pool_bound", "pointer_reduced_motion", "pointer_touch_disabled"]}))
+    print(json.dumps({"ok": True, "scenarios": ["flat_and_mixed_menu", "repeat_pjax", "menu_update", "native_menu_recovery", "theme_toggle", "disabled_widgets", "native_loading_preserved", "privacy_link", "copy_success", "copy_denied", "visible_cover_priority", "cover_fallback", "space_hero_pjax", "space_hero_page_exit", "space_hero_reduced_motion", "space_hero_light_mode", "nebula_image_fallback", "light_profile_contrast", "pointer_tracks_and_trails", "pointer_click_through", "pointer_pjax_pool_bound", "pointer_reduced_motion", "pointer_touch_disabled", "resume_content_preserved", "resume_repeat_pjax"]}))
 
 
 def run_browser_checks(port):
@@ -111,6 +111,14 @@ def run_browser_checks(port):
         assert browser.evaluate("getComputedStyle(document.querySelector('.author-info__name')).color") == 'rgb(47, 41, 64)'
         browser.evaluate("document.querySelector('#home_top').remove();document.dispatchEvent(new Event('pjax:complete'));true")
         assert browser.evaluate("document.querySelectorAll('#ab-space-hero').length") == 0
+        browser.evaluate("document.body.insertAdjacentHTML('beforeend','<article id=\"article-container\"><h2>示例姓名</h2><p>学校与联系信息</p><h2>教育经历</h2><h3>示例学校</h3><p>教育正文</p><h2>项目经历</h2><h3>示例项目</h3><ul><li>项目正文</li></ul></article>');history.pushState({},'', '/resume');document.dispatchEvent(new Event('pjax:complete'));true")
+        assert browser.evaluate("document.querySelectorAll('.ab-resume-profile').length") == 1
+        assert browser.evaluate("document.querySelectorAll('.ab-resume-section').length") == 2
+        assert browser.evaluate("document.querySelectorAll('.ab-resume-entry').length") == 2
+        assert browser.evaluate("[...document.querySelectorAll('.ab-resume-toc a')].every(a=>document.querySelector(a.getAttribute('href')))")
+        browser.evaluate("document.dispatchEvent(new Event('pjax:complete'));window.__abInstallResume();true")
+        assert browser.evaluate("document.querySelectorAll('.ab-resume-profile').length") == 1
+        assert browser.evaluate("[...document.querySelectorAll('.ab-resume-entry p,.ab-resume-entry li')].map(e=>e.textContent)") == ['教育正文', '项目正文']
 
 
 def run_pointer_checks(port):

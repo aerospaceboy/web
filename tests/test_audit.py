@@ -1,6 +1,6 @@
 import unittest
 
-from blog_tools.audit import content_hash, inspect_html
+from blog_tools.audit import content_hash, inspect_html, inspect_resume
 from blog_tools.build import STYLE_ID
 
 
@@ -68,3 +68,19 @@ class AuditTests(unittest.TestCase):
         result = inspect_html('/privacy-policy', '请在此处添加你的隐私政策内容。',
                               {'privacy_policy_path': '/privacy-policy'}, 'abc')
         self.assertIn('privacy_policy_placeholder_content', result['warnings'])
+
+    def test_resume_http_200_or_navigation_does_not_hide_empty_body(self):
+        source = '<a href="/upload/resume.pdf">Download</a><article id="article-container"><p></p></article>'
+        result = inspect_resume(source, {'attachment_url': 'https://example.com/upload/resume.pdf'})
+        self.assertIn('resume_content_empty_or_truncated', result)
+        self.assertIn('resume_pdf_link_missing', result)
+
+    def test_resume_scripts_are_not_counted_as_published_body(self):
+        source = '<article id="article-container"><script>' + '正文' * 300 + '</script></article>'
+        self.assertIn('resume_content_empty_or_truncated', inspect_resume(source, {'attachment_url': '/upload/resume.pdf'}))
+
+    def test_complete_resume_with_nested_headings_passes(self):
+        sections = ''.join('<h2><span>' + title + '</span></h2><p>' + '示例内容' * 20 + '</p>'
+                           for title in ['教育经历', '项目经历', '科研经历', '在校工作经历', '荣誉奖项'])
+        source = '<article id="article-container">' + sections + '<br><a href="/upload/resume.pdf">下载 PDF</a></article>'
+        self.assertEqual(inspect_resume(source, {'attachment_url': 'https://example.com/upload/resume.pdf'}), [])

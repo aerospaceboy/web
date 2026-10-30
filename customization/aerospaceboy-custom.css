@@ -431,6 +431,46 @@ body:has(#ab-space-hero) .recent-post-item .post_cover img { transition: transfo
     body:has(#ab-space-hero) { background-attachment: scroll; }
 }
 
+/* ---------- Resume / 简历入口与内容 ---------- */
+#ab-space-hero .ab-resume-link {
+    display: inline-flex;align-items: center;min-height: 36px;margin-top: 12px;
+    color: #d6c8e9;font-size: 12px;letter-spacing: .05em;
+}
+#ab-space-hero .ab-resume-link:hover { color: #fff; }
+#article-container.ab-resume { max-width: 920px; }
+.ab-resume-profile {
+    padding: 28px 30px;border: var(--ab-border);border-radius: 16px;
+    background: linear-gradient(125deg, rgba(146, 114, 190, .16), rgba(101, 129, 184, .06));
+    margin-bottom: 20px;
+}
+#article-container .ab-resume-profile h2 { font-size: 34px;margin: 0 0 10px; }
+#article-container .ab-resume-profile p { margin: 7px 0; }
+.ab-resume-profile a[href$=".pdf"] {
+    display: inline-flex;align-items: center;justify-content: center;min-height: 44px;
+    padding: 8px 18px;margin-top: 8px;border-radius: 8px;background: #d7c4fa;color: #24172e !important;
+    font-size: 14px;text-decoration: none !important;
+}
+.ab-resume-toc { display: flex;flex-wrap: wrap;gap: 8px;margin-bottom: 26px; }
+.ab-resume-toc a { display: inline-flex;align-items: center;min-height: 40px;padding: 6px 12px;border: var(--ab-border);border-radius: 8px;font-size: 13px; }
+.ab-resume-section { scroll-margin-top: 90px;margin-bottom: 30px; }
+#article-container .ab-resume-section > h2 { font-size: 23px;margin: 24px 0 14px; }
+.ab-resume-entry { padding: 18px 22px;margin-bottom: 14px;border: var(--ab-border);border-radius: 12px;background: var(--ab-card-bg); }
+#article-container .ab-resume-entry h3 { font-size: 17px;margin: 0 0 10px;line-height: 1.65; }
+#article-container .ab-resume-entry p:last-child, #article-container .ab-resume-entry ul:last-child { margin-bottom: 0; }
+.ab-resume a:focus-visible { outline: 2px solid currentColor;outline-offset: 3px; }
+@media (max-width: 768px) {
+    .ab-resume-profile { padding: 20px; }
+    #article-container .ab-resume-profile h2 { font-size: 29px; }
+    .ab-resume-entry { padding: 16px; }
+    .ab-resume-toc a { min-height: 44px;font-size: 12px; }
+    #article-container.ab-resume { font-size: 15px; }
+}
+@media print {
+    .ab-resume-toc, #ab-pointer-light { display: none !important; }
+    #article-container.ab-resume { max-width: none;color: #111;background: #fff;font-size: 11pt; }
+    .ab-resume-entry { break-inside: avoid;background: none; }
+}
+
 /* ---------- Pointer / 桌面鼠标光晕与短暂星尘 ---------- */
 #ab-pointer-light {
     position: fixed;

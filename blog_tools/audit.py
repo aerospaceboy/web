@@ -70,6 +70,64 @@ class PageMetadata(HTMLParser):
             self._script_attrs = None
 
 
+class ArticleContent(HTMLParser):
+    """Inspect only server-rendered article content, excluding injected scripts."""
+    VOID = {'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr'}
+
+    def __init__(self):
+        super().__init__()
+        self.stack = []
+        self.text = []
+        self.headings = []
+        self.links = []
+        self._heading = None
+
+    def handle_starttag(self, tag, attrs):
+        attrs = dict(attrs)
+        if not self.stack and attrs.get('id') == 'article-container':
+            self.stack.append(tag)
+            return
+        if not self.stack:
+            return
+        if tag == 'a' and attrs.get('href'):
+            self.links.append(attrs['href'])
+        if tag == 'h2':
+            self._heading = []
+        if tag not in self.VOID:
+            self.stack.append(tag)
+
+    def handle_data(self, data):
+        if self.stack and not any(tag in {'script', 'style'} for tag in self.stack):
+            self.text.append(data)
+            if self._heading is not None:
+                self._heading.append(data)
+
+    def handle_endtag(self, tag):
+        if not self.stack:
+            return
+        if tag == 'h2' and self._heading is not None:
+            self.headings.append(''.join(self._heading).strip())
+            self._heading = None
+        if tag in self.stack:
+            while self.stack:
+                if self.stack.pop() == tag:
+                    break
+
+
+def inspect_resume(source, record):
+    page = ArticleContent()
+    page.feed(source)
+    issues = []
+    expected = {'教育经历', '项目经历', '科研经历', '在校工作经历', '荣誉奖项'}
+    if not expected.issubset(page.headings):
+        issues.append('resume_sections_missing')
+    if len(''.join(page.text).strip()) < 300:
+        issues.append('resume_content_empty_or_truncated')
+    if urlsplit(record['attachment_url']).path not in page.links:
+        issues.append('resume_pdf_link_missing')
+    return issues
+
+
 def content_hash(text):
     return hashlib.sha256((text.replace("\r\n", "\n").strip() + "\n").encode("utf-8")).hexdigest()
 
@@ -100,6 +158,8 @@ def inspect_html(path, source, config, digest, navigation_digest=None, covers=No
     elif navigation_digest is not None and page.navigation[0].get("actual_sha256") != navigation_digest:
         issues.append("mobile_navigation_content_mismatch")
     base = config.get("base_url", "https://aerospaceboy.site")
+    if path == '/' and config.get('resume_path') and config['resume_path'] not in page.links:
+        issues.append('resume_navigation_missing')
     if '/cc' in page.links:
         issues.append('broken_legacy_license_link')
     client_rewrites = {}
@@ -141,6 +201,10 @@ def audit(config):
         paths.extend('/archives/' + slug for slug in covers if slug != 'default')
     if config.get('privacy_policy_path'):
         paths.append(config['privacy_policy_path'])
+    resume_path = ROOT / 'config/resume-deployment.json'
+    resume = json.loads(resume_path.read_text(encoding='utf-8-sig')) if config.get('resume_path') and resume_path.exists() else None
+    if resume:
+        paths.append(config['resume_path'])
     paths = list(dict.fromkeys(paths))
 
     def check(path):
@@ -158,6 +222,8 @@ def audit(config):
                     result["issues"].append("empty_feed_or_sitemap")
             else:
                 result = inspect_html(path, source, config, digest, navigation_digest, covers)
+                if resume and path == config['resume_path']:
+                    result['issues'].extend(inspect_resume(source, resume))
             result["status"] = status
             if redirected:
                 result["issues"].append("unexpected_redirect")
@@ -173,6 +239,9 @@ def audit(config):
     if visual_assets_path.exists():
         visual_assets = json.loads(visual_assets_path.read_text(encoding='utf-8-sig'))
         asset_records.update({'visual/' + key: value for key, value in visual_assets.items()})
+    if resume:
+        asset_records['resume/pdf'] = {'url': resume['attachment_url'], 'sha256': resume['sha256'],
+                                       'bytes': resume['bytes'], 'mime': 'application/pdf'}
     if asset_records:
         def check_asset(item):
             slug, record = item
@@ -183,7 +252,7 @@ def audit(config):
                     data = response.read(1024 * 1024 + 1)
                     actual_hash = hashlib.sha256(data).hexdigest()
                     ok = (actual_hash == record['sha256'] and len(data) == record['bytes'] and
-                          response.headers.get_content_type() == 'image/webp')
+                          response.headers.get_content_type() == record.get('mime', 'image/webp'))
                 return {'slug': slug, 'ok': ok, 'bytes': len(data), 'sha256': actual_hash}
             except (HTTPError, URLError, OSError):
                 return {'slug': slug, 'ok': False, 'error': 'asset_request_failed'}

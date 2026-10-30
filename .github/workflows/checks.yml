@@ -29,3 +29,4 @@ jobs:
       - run: node --check customization/mobile-navigation.js
       - run: node --check customization/space-effects.js
       - run: node --check customization/pointer-effects.js
+      - run: node --check customization/resume-enhancement.js
