@@ -23,7 +23,7 @@ def navigation_source(config):
             raise ValueError("Public paths must be relative to the site origin")
     prefix = "window.__abPublicConfig = " + json.dumps(settings, ensure_ascii=True).replace("<", "\\u003c") + ";\n"
     return prefix + "\n".join((ROOT / "customization" / name).read_text(encoding="utf-8")
-                               for name in ("mobile-navigation.js", "space-effects.js", "pointer-effects.js", "resume-enhancement.js"))
+                               for name in ("mobile-navigation.js", "header-layout.js", "space-effects.js", "pointer-effects.js", "resume-enhancement.js"))
 
 
 def build(output=ROOT / "build", config_path=ROOT / "config/site.json"):

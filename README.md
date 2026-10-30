@@ -100,11 +100,15 @@ Pjax 返回首页时恢复单一实例；不可见时暂停动态星点，系统
 .\.venv\Scripts\python.exe .cdp-shot.py https://aerospaceboy.site/ 390 844 reports/home-390.png
 .\.venv\Scripts\python.exe .cdp.py https://aerospaceboy.site/archives/pid-control-intro 390 844 --inject-css customization/aerospaceboy-custom.css --check
 .\.venv\Scripts\python.exe -m blog_tools.check_navigation
+.\.venv\Scripts\python.exe -m blog_tools.check_header --local-bundle
+.\.venv\Scripts\python.exe -m blog_tools.check_header
 ```
 
 `--inject-css` 用于隔离浏览器预览，会在本地文档移除旧定制样式并添加新 CSS；不会修改服务器。桌面和移动视口分别设置设备参数，每次运行使用独立配置目录与动态调试端口，不复用个人浏览器登录状态。
 
 `.cdp2.py` 保留页面表达式检查入口。`.shot*.sh` 保留 Git Bash 截图兼容入口，结果写到 `reports/screenshots/`，不覆盖历史截图；旧亮度阈值不再作为验收标准。
+
+`check_header --local-bundle` 在本机快照中保持线上 CSS/脚本顺序，仅替换两个定制块，不修改服务器；不带该参数时直接检查公网。默认按 390–1920 CSS 像素缩小并重新放大，检查主菜单与站点名/完整工具区是否相撞、是否换行，以及收起后菜单入口是否完整。当前导航由 `header-layout.js` 观察实际占用空间，空间不足时使用原生侧栏，避免浏览器放大后互相覆盖。
 
 ## 简历页面维护
 

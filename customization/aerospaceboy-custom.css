@@ -223,34 +223,57 @@ body:has(#home_top) #recent-posts:not(:has(.recent-post-item))::after {
     letter-spacing: .05em;
 }
 
-/* ---------- Mobile 精修 ---------- */
-#ab-mobile-navigation {
-    display: none;
+/* ---------- Header：站点名、主菜单与整组工具各占自己的空间 ---------- */
+#page-header #nav #nav-group { gap: 16px; }
+#page-header #nav #blog_name { flex: 0 0 auto;min-width: 0; }
+#page-header #nav #site-name { white-space: nowrap; }
+#page-header #nav #page-name-mask { display: none !important; }
+#page-header #nav #menus {
+    position: static;flex: 1 1 auto;min-width: 0;width: auto;
+    padding: 0 !important;justify-content: center;
+}
+#page-header #nav #menus > .menus_items {
+    position: static !important;top: auto !important;width: max-content;
+    display: flex;flex-wrap: nowrap;align-items: center;margin: 0 auto;transform: none !important;transition: none !important;
+}
+#page-header #nav #menus > .menus_items > .menus_item {
+    flex: 0 0 auto;margin: 0;padding: 0 3px;
+}
+#page-header #nav #menus > .menus_items > .menus_item > a {
+    white-space: nowrap;letter-spacing: .05em;padding-inline: 8px;
+}
+#page-header #nav #nav-right { position: static;margin: 0 0 0 auto;flex: 0 0 auto; }
+#page-header #nav.ab-nav-wide #menus > .menus_items { visibility: visible;opacity: 1; }
+#page-header #nav.ab-nav-wide #toggle-menu { display: none !important; }
+#page-header #nav.ab-nav-compact #menus > .menus_items { visibility: hidden;pointer-events: none; }
+#page-header #nav.ab-nav-compact #menus > .menus_items * { visibility: hidden !important;transition: none !important; }
+#page-header #nav.ab-nav-compact #toggle-menu { display: block !important; }
+/* Keep a safe compact fallback while JavaScript/fonts are still loading. */
+@media (max-width: 1250px) {
+    #page-header #nav:not(.ab-nav-wide) #menus > .menus_items { visibility: hidden; }
+    #page-header #nav:not(.ab-nav-wide) #toggle-menu { display: block !important; }
 }
 @media (max-width: 768px) {
-    #ab-mobile-navigation {
-        display: block;
-        margin-bottom: 16px;
-    }
-    .ab-mobile-nav-links {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 8px;
-    }
-    .ab-mobile-nav-links a {
-        display: flex;
-        align-items: center;
-        min-height: 44px;
-        padding: 8px 12px;
-        border: var(--ab-border);
-        border-radius: 10px;
-        color: inherit;
-        background: var(--ab-card-bg);
-    }
-    .ab-mobile-nav-links a:focus-visible {
-        outline: 2px solid currentColor;
-        outline-offset: 2px;
-    }
+    #page-header #nav #nav-group { gap: 12px; }
+}
+
+/* The sidebar is also used when zoom collapses a desktop header. */
+#ab-mobile-navigation {
+    display: block;
+    margin-bottom: 16px;
+}
+.ab-mobile-nav-links {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+.ab-mobile-nav-links a {
+    display: flex;align-items: center;min-height: 44px;padding: 8px 12px;
+    border: var(--ab-border);border-radius: 10px;color: inherit;background: var(--ab-card-bg);
+}
+.ab-mobile-nav-links a:focus-visible { outline: 2px solid currentColor;outline-offset: 2px; }
+/* ---------- Mobile 精修 ---------- */
+@media (max-width: 768px) {
     /* 手机端保留两个主要入口，文章从下方列表阅读，减少首屏重复内容。 */
     #home_top #topGroup {
         display: none;
