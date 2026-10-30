@@ -7,8 +7,10 @@ import json
 from pathlib import Path
 import re
 import tempfile
+import time
 from threading import Thread
 from urllib.request import urlopen
+from urllib.parse import urlsplit
 
 from . import configure_console
 from .browser import Browser
@@ -74,6 +76,38 @@ def check(browser, output, widths):
     return results
 
 
+def check_train_hover(browser):
+    snapshot = """(() => {
+        const link = document.querySelector('#travellings_button a');
+        if (!link) return {missing:true};
+        const box = link.getBoundingClientRect();
+        return {x:box.x, y:box.y, width:box.width, height:box.height,
+            mode:document.querySelector('#nav').classList.contains('ab-nav-compact') ? 'compact' : 'wide'};
+    })()"""
+    results = []
+    for width in [800, 849, 900, 1100, 1300]:
+        browser.command('Input.dispatchMouseEvent', {'type':'mouseMoved', 'x':20, 'y':500})
+        browser.command('Emulation.setDeviceMetricsOverride', {
+            'width':width, 'height':900, 'deviceScaleFactor':1, 'mobile':False})
+        browser.evaluate('new Promise(r=>setTimeout(r,450))', promise=True)
+        before = browser.evaluate(snapshot)
+        if before.get('missing') or not before['width']:
+            results.append({'width':width, 'ok':False, 'reason':'train_button_missing_or_hidden'})
+            continue
+        browser.command('Input.dispatchMouseEvent', {
+            'type':'mouseMoved', 'x':before['x']+before['width']/2, 'y':before['y']+before['height']/2})
+        samples = []
+        for _ in range(20):
+            samples.append(browser.evaluate(snapshot))
+            time.sleep(.1)
+        movement = max(abs(row['x'] - before['x']) for row in samples)
+        modes = sorted({row['mode'] for row in samples})
+        results.append({'width':width, 'before_mode':before['mode'], 'hover_modes':modes,
+                        'button_movement':round(movement, 2),
+                        'ok':modes == [before['mode']] and movement <= 1})
+    return results
+
+
 def main():
     configure_console()
     parser = argparse.ArgumentParser(description=__doc__)
@@ -81,6 +115,7 @@ def main():
     parser.add_argument('--local-bundle', action='store_true', help='Preview current sources without changing the site')
     parser.add_argument('--output', type=Path, default=ROOT / 'reports/header-check.json')
     parser.add_argument('--widths', nargs='+', type=int, default=[1920, 1600, 1440, 1366, 1280, 1200, 1100, 1000, 900, 800, 769, 768, 390, 1200, 1920])
+    parser.add_argument('--train-hover', action='store_true', help='Assert train hover cannot move the button or switch header mode')
     args = parser.parse_args()
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix='header-', dir=ROOT / '.cache') as directory:
@@ -104,26 +139,40 @@ def main():
                     raise RuntimeError('Expected deployed customization block was not found')
             html = html.replace('<head>', '<head><base href="https://aerospaceboy.site/">', 1)
             (directory / 'index.html').write_text(html, encoding='utf-8')
+            preview_path = urlsplit(args.url).path or '/'
+            snapshot = html.encode('utf-8')
             class QuietHandler(SimpleHTTPRequestHandler):
                 def log_message(self, *args):
                     pass
+                def do_GET(self):
+                    if self.path.split('?', 1)[0] == preview_path:
+                        self.send_response(200)
+                        self.send_header('Content-Type', 'text/html; charset=utf-8')
+                        self.send_header('Content-Length', str(len(snapshot)))
+                        self.end_headers()
+                        self.wfile.write(snapshot)
+                    else:
+                        super().do_GET()
             server = ThreadingHTTPServer(('127.0.0.1', 0), partial(QuietHandler, directory=str(directory)))
             worker = Thread(target=server.serve_forever, daemon=True)
             worker.start()
-            target = f'http://127.0.0.1:{server.server_port}/index.html'
+            target = f'http://127.0.0.1:{server.server_port}{preview_path}'
         try:
             with Browser(1920, 900) as browser:
                 browser.navigate(target)
                 rows = check(browser, args.output, args.widths)
+                hover_rows = check_train_hover(browser) if args.train_hover else []
         finally:
             if server:
                 server.shutdown()
                 server.server_close()
                 worker.join()
-    result = {'ok': all(row['ok'] for row in rows), 'preview': args.local_bundle, 'viewports': rows}
+    result = {'ok': all(row['ok'] for row in rows + hover_rows), 'preview': args.local_bundle,
+              'viewports': rows, 'train_hover':hover_rows}
     args.output.write_text(json.dumps(result, indent=2) + '\n', encoding='utf-8')
     print(json.dumps({'ok': result['ok'], 'preview': args.local_bundle,
-                      'cases': len(rows), 'failed_widths': [r['width'] for r in rows if not r['ok']]}))
+                      'cases': len(rows), 'failed_widths': [r['width'] for r in rows if not r['ok']],
+                      'train_hover':hover_rows}))
     raise SystemExit(0 if result['ok'] else 1)
 
 

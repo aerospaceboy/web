@@ -1,7 +1,7 @@
 /* Measure all three header regions; browser zoom changes the available CSS width. */
 (() => {
     if (window.__abInstallHeaderLayout) { window.__abInstallHeaderLayout();return; }
-    let group, observer, frame = 0;
+    let group, observer, measuredMenu, menuWidth = 0, frame = 0;
     const outerWidth = element => {
         const style = getComputedStyle(element);
         if (style.display === 'none') return 0;
@@ -16,6 +16,12 @@
         const menu = group.querySelector('#menus > .menus_items');
         const tools = group.querySelector('#nav-right');
         if (!nav || !brand || !menu || !tools) return;
+        if (measuredMenu !== menu) { measuredMenu = menu;menuWidth = 0; }
+        const currentWidth = menu.getBoundingClientRect().width;
+        // Hao temporarily hides this row while showing toolbar hover tips.
+        // Zero is not a new intrinsic width: using it switches mode, moves the
+        // hovered button and can repeatedly enter/leave the same hover state.
+        if (currentWidth > 0) menuWidth = currentWidth;
         const style = getComputedStyle(group);
         // Exclude the compact toggle itself, so changing mode cannot cause oscillation.
         const toolWidth = [...tools.children].filter(e => e.id !== 'toggle-menu')
@@ -23,7 +29,7 @@
         const available = group.clientWidth - (parseFloat(style.paddingLeft) || 0) -
             (parseFloat(style.paddingRight) || 0) - outerWidth(brand) - toolWidth -
             2 * (parseFloat(style.columnGap) || 0);
-        const compact = innerWidth <= 768 || menu.getBoundingClientRect().width + 16 > available;
+        const compact = innerWidth <= 768 || !menuWidth || menuWidth + 16 > available;
         nav.classList.toggle('ab-nav-compact', compact);
         nav.classList.toggle('ab-nav-wide', !compact);
         menu.inert = compact;

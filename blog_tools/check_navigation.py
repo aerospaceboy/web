@@ -34,6 +34,8 @@ def main():
             '<a class="site-page" href="/about">关于</a>'
             '<a class="site-page" href="/projects">重复链接</a>'
             '<a class="site-page" href="javascript:void(0)">分组</a></header>'
+            '<div id="travellings_button"><a class="site-page" href="https://www.travellings.cn/go.html" '
+            'rel="external nofollow">开往</a></div>'
             '<aside id="sidebar-menus"><a href="/about">原有关于入口</a>'
             '<a class="darkmode_switchbutton" onclick="rm.switchDarkMode()">显示模式</a></aside>'
             '<div class="comment-randomInfo"><a href="/privacy">隐私政策</a></div>'
@@ -49,12 +51,13 @@ def main():
         worker.start()
         try:
             run_browser_checks(server.server_port)
+            run_train_checks(server.server_port)
             run_pointer_checks(server.server_port)
         finally:
             server.shutdown()
             server.server_close()
             worker.join()
-    print(json.dumps({"ok": True, "scenarios": ["flat_and_mixed_menu", "repeat_pjax", "menu_update", "native_menu_recovery", "theme_toggle", "disabled_widgets", "native_loading_preserved", "privacy_link", "copy_success", "copy_denied", "visible_cover_priority", "cover_fallback", "space_hero_pjax", "space_hero_page_exit", "space_hero_reduced_motion", "space_hero_light_mode", "nebula_image_fallback", "light_profile_contrast", "pointer_tracks_and_trails", "pointer_click_through", "pointer_pjax_pool_bound", "pointer_reduced_motion", "pointer_touch_disabled", "resume_content_preserved", "resume_repeat_pjax"]}))
+    print(json.dumps({"ok": True, "scenarios": ["flat_and_mixed_menu", "repeat_pjax", "menu_update", "native_menu_recovery", "theme_toggle", "disabled_widgets", "native_loading_preserved", "privacy_link", "copy_success", "copy_denied", "visible_cover_priority", "cover_fallback", "space_hero_pjax", "space_hero_page_exit", "space_hero_reduced_motion", "space_hero_light_mode", "nebula_image_fallback", "light_profile_contrast", "pointer_tracks_and_trails", "pointer_click_through", "pointer_pjax_pool_bound", "pointer_reduced_motion", "pointer_touch_disabled", "resume_content_preserved", "resume_repeat_pjax", "train_native_new_tab", "train_repeat_pjax", "train_source_usable_with_target_paused"]}))
 
 
 def run_browser_checks(port):
@@ -119,6 +122,38 @@ def run_browser_checks(port):
         browser.evaluate("document.dispatchEvent(new Event('pjax:complete'));window.__abInstallResume();true")
         assert browser.evaluate("document.querySelectorAll('.ab-resume-profile').length") == 1
         assert browser.evaluate("[...document.querySelectorAll('.ab-resume-entry p,.ab-resume-entry li')].map(e=>e.textContent)") == ['教育正文', '项目正文']
+
+
+def run_train_checks(port=None, *, url=None):
+    with Browser(1000, 800) as browser:
+        browser.navigate(url or f'http://127.0.0.1:{port}/fixture.html')
+        source_url = browser.evaluate('location.href')
+        link = "document.querySelector('#travellings_button a')"
+        assert browser.evaluate(link + ".target") == '_blank', 'External train link must preserve the source tab'
+        assert browser.evaluate(link + ".relList.contains('noopener') && " + link + ".relList.contains('noreferrer')")
+        browser.evaluate("for(let i=0;i<3;i++)document.dispatchEvent(new Event('pjax:complete'));true")
+        assert browser.evaluate(link + ".target") == '_blank'
+        known = {target['targetId'] for target in browser.command('Target.getTargets')['targetInfos']}
+        # Hold the new page before it runs any external code: the source must
+        # remain usable even if the external destination never finishes loading.
+        browser.command('Target.setAutoAttach', {'autoAttach': True, 'waitForDebuggerOnStart': True, 'flatten': True})
+        box = browser.evaluate(link + '.getBoundingClientRect().toJSON()')
+        point = {'x': box['x'] + box['width'] / 2, 'y': box['y'] + box['height'] / 2,
+                 'button': 'left', 'clickCount': 1}
+        browser.command('Input.dispatchMouseEvent', {'type': 'mousePressed', **point})
+        browser.command('Input.dispatchMouseEvent', {'type': 'mouseReleased', **point})
+        deadline = time.monotonic() + 2
+        while True:
+            pages = [target for target in browser.command('Target.getTargets')['targetInfos']
+                     if target['type'] == 'page' and target['targetId'] not in known
+                     and target.get('openerId') in known]
+            if pages or time.monotonic() >= deadline:
+                break
+            time.sleep(.05)
+        assert len(pages) == 1, pages
+        assert browser.evaluate('location.href') == source_url
+        assert browser.evaluate("document.documentElement.dataset.theme='dark';document.querySelector('.darkmode_switchbutton').click();document.documentElement.dataset.theme") == 'light'
+        browser.command('Target.closeTarget', {'targetId': pages[0]['targetId']})
 
 
 def run_pointer_checks(port):

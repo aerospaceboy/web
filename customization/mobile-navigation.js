@@ -44,6 +44,19 @@
 
     const repairPageControls = () => {
         const config = window.__abPublicConfig || {};
+        const travelling = document.querySelector('#travellings_button a[href]');
+        if (travelling) {
+            const url = new URL(travelling.href, document.baseURI);
+            if (['http:', 'https:'].includes(url.protocol) &&
+                ['travellings.cn', 'www.travellings.cn'].includes(url.hostname)) {
+                // This is an external random-site service. Keep its network and
+                // destination loading out of the source tab; use a native link.
+                travelling.target = '_blank';
+                travelling.rel = [...new Set([...travelling.relList, 'noopener', 'noreferrer'])].join(' ');
+                travelling.title = '开往：随机访问外部网站（新标签页）';
+                travelling.setAttribute('aria-label', travelling.title);
+            }
+        }
         const privacy = config.privacyPolicyPath;
         if (privacy) {
             for (const link of document.querySelectorAll('.comment-randomInfo a[href]')) {
