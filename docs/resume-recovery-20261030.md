@@ -1,5 +1,7 @@
 # 网站恢复验证（2026-10-30）
 
+本文件记录首次恢复及当时的两页派生 PDF。用户随后提供新版一页 PDF，已完成替换下载与联系方式修正；当前状态见 [新版更新记录](resume-update-20261030.md)，部署清单以 `config/resume-deployment.json` 为准。
+
 ## 简历上线
 
 公开页面：https://aerospaceboy.site/resume 。原始 DOCX、私有 JSON 和两页 PDF 未重新改写。

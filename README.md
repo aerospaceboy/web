@@ -115,13 +115,13 @@ Pjax 返回首页时恢复单一实例；不可见时暂停动态星点，系统
 
 ## 简历页面维护
 
-简历文本使用 Halo 独立页面保存，PDF 放在本站附件库。生成工具 `blog_tools.resume` 从本机私有 JSON 生成 HTML，`--pdf` 可用随附文档运行时导出两页打印版。个人内容、原始 DOCX 和生成 PDF 保持在被忽略的 `backups/`、`build/` 中；仓库只提交工具、样式、部署路径和附件校验值。
+简历文本使用 Halo 独立页面保存，PDF 放在本站附件库。当前下载采用用户在 2026-10-30 提供的一页 PDF 原件，部署校验值见 `config/resume-deployment.json`。生成工具 `blog_tools.resume` 从本机私有 JSON 生成 HTML；个人内容、原始文件和产物保持在被忽略的 `backups/`、`build/` 中，仓库只提交工具、样式、部署路径和附件校验值。
 
 ```powershell
-.\.venv\Scripts\python.exe -m blog_tools.resume --input backups/resume-20261029/resume.json --output build/resume-body.html
+.\.venv\Scripts\python.exe -m blog_tools.resume --input backups/resume-20261030/resume.json --output build/resume-body.html
 ```
 
-`--pdf build/ab-resume-20261029.pdf` 需要文档运行时中的 ReportLab 和 Windows 微软雅黑字体。源简历保留原样；网页/PDF 是重新排版的展示版，不假定与 Word 原稿版式一致。
+可选的 `--pdf build/resume-derived-print.pdf` 会重新排版一个独立打印副本，需要文档运行时中的 ReportLab 和 Windows 微软雅黑字体；不要用此派生副本覆盖当前提供下载的用户 PDF 原件。网页结构与 PDF 原稿版式不同，事实内容仍须逐项核对。
 
 发布时须保存后重新打开编辑器核对正文，再发布并直接检查 `/resume` 的服务端内容；不能凭粘贴后可见内容或 HTTP 200 认定保存成功。审计会检查五个主要章节、正文长度、PDF 下载链接和附件哈希。
 
