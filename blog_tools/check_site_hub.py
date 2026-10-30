@@ -13,6 +13,7 @@ from urllib.request import urlopen
 from . import configure_console
 from .browser import Browser
 from .build import build
+from .check_motion import run_motion_checks
 from .publish import ROOT
 
 BASE = 'https://aerospaceboy.site'
@@ -29,6 +30,7 @@ def run(browser, base, output):
         hero:document.querySelectorAll('.ab-hero-socials').length,
         resume:document.querySelectorAll('.ab-hero-copy .ab-resume-link').length,
         preference:document.querySelectorAll('#ab-preferences-card').length,
+        hashes:[...document.querySelectorAll('[data-ab-sha256]')].map(e=>e.dataset.abSha256),
         overflow:document.documentElement.scrollWidth>innerWidth+1
     }))()""")
     assert len(initial['github']) == 4, initial
@@ -37,6 +39,7 @@ def run(browser, base, output):
     assert initial['rss'] == '/rss.xml' and initial['shortcuts'] == 4, initial
     assert initial['hero'] == initial['resume'] == initial['preference'] == 1, initial
     assert not initial['overflow'], initial
+    motion = run_motion_checks(browser, base, output)
     browser.screenshot(output.parent / (output.stem + '-desktop.png'))
     browser.evaluate("document.querySelector('#content-inner').scrollIntoView()")
     browser.evaluate("new Promise(r=>setTimeout(r,400))", promise=True)
@@ -113,7 +116,7 @@ def run(browser, base, output):
     browser.screenshot(output.parent / (output.stem + '-mobile-menu.png'))
     browser.navigate(base + '/')
     browser.screenshot(output.parent / (output.stem + '-mobile.png'))
-    return {'social':initial, 'light':light, 'repeat_pjax_and_calm':repeat, 'post_preferences':post, 'resume_unchanged':resume, 'mobile':mobile}
+    return {'social':initial, 'motion':motion, 'light':light, 'repeat_pjax_and_calm':repeat, 'post_preferences':post, 'resume_unchanged':resume, 'mobile':mobile}
 
 
 def main():

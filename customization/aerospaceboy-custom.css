@@ -632,8 +632,69 @@ html.ab-calm-mode { scroll-behavior: auto; }
 .ab-calm-mode :is(#ab-space-hero *, .card-widget, .recent-post-item, .post_cover img, .ab-proj-card) { transition: none !important; }
 .ab-calm-mode :is(.card-widget:hover, .recent-post-item:hover, .ab-proj-card:hover, .recent-post-item:hover .post_cover img, #ab-space-hero .ab-hero-actions a:hover) { transform: none; }
 
+/* ---------- Ambient motion / 樱花、流萤与打字字幕 ---------- */
+#ab-ambient-effects {
+    position: fixed;inset: 0;z-index: 9;overflow: clip;pointer-events: none;user-select: none;contain: strict;
+}
+#ab-ambient-effects * { pointer-events: none !important; }
+.ab-fall-track {
+    position: absolute;top: -40px;width: var(--ab-fall-size);height: var(--ab-fall-size);
+    animation: ab-petal-fall var(--ab-fall-duration) linear var(--ab-fall-delay) infinite;
+}
+.ab-fall-particle {
+    display: block;width: 100%;height: 75%;opacity: .58;border-radius: 80% 15% 75% 25%;
+    background: linear-gradient(135deg,#ffe6f2,#d5b5ec 65%,#ae91d2);
+    animation: ab-petal-sway var(--ab-fall-sway) ease-in-out var(--ab-fall-delay) infinite alternate;
+}
+[data-mode="fireflies"] .ab-fall-track { width: 5px;height: 5px;animation-name: ab-firefly-rise; }
+[data-mode="fireflies"] .ab-fall-particle {
+    height: 100%;border-radius: 50%;background: #e8dfad;box-shadow: 0 0 10px 2px rgba(223,214,164,.25);
+    animation-name: ab-firefly-glow;
+}
+body:has(#ab-ambient-effects) #universe { display: none; }
+.ab-motion-enabled #ab-space-hero .ab-nebula-image { animation: ab-nebula-pan 22s ease-in-out infinite alternate; }
+.ab-motion-enabled #ab-space-hero .ab-hero-copy { animation: ab-hero-arrive .7s cubic-bezier(.2,.7,.25,1) both; }
+.ab-sky-paused .ab-nebula-image { animation-play-state: paused !important; }
+.ab-typewriter-text { color: inherit; }
+.ab-typewriter-caret { display: inline-block;width: 2px;height: .95em;margin-left: 5px;vertical-align: -.08em;background: #d7c4f1;opacity: 0; }
+.ab-typewriter-running .ab-typewriter-caret { opacity: 1;animation: ab-caret-blink 1s steps(1,end) infinite; }
+.ab-motion-paused :is(.ab-fall-track,.ab-fall-particle,.ab-nebula-image,.ab-typewriter-caret) { animation-play-state: paused !important; }
+.ab-ambient-label { display: flex;flex-direction: column;gap: 8px;padding-top: 12px;border-top: var(--ab-border);font-size: 13px; }
+.ab-ambient-label select {
+    display: block;width: 100%;min-width: 0;min-height: 42px;padding: 8px 10px;border: var(--ab-border);border-radius: 8px;
+    background: var(--ab-surface);color: inherit;font-family: inherit;font-size: 13px;cursor: pointer;color-scheme: dark;
+}
+[data-theme="light"] .ab-ambient-label select { color-scheme: light; }
+.ab-ambient-label select:focus-visible { outline: 2px solid var(--ab-accent);outline-offset: 3px; }
+.ab-preferences .ab-motion-note { font-size: 11px;line-height: 1.65;opacity: .7;margin: 3px 0 10px; }
+.ab-calm-mode :is(#ab-ambient-effects,.ab-typewriter-caret) { display: none !important; }
+.ab-calm-mode #ab-space-hero :is(.ab-nebula-image,.ab-hero-copy) { animation: none !important; }
+@keyframes ab-petal-fall {
+    from { transform: translate3d(0,-20px,0) rotate(-15deg); }
+    to { transform: translate3d(var(--ab-fall-drift),calc(100vh + 80px),0) rotate(155deg); }
+}
+@keyframes ab-petal-sway { from { transform: rotate(-30deg) scaleX(.5); }to { transform: rotate(30deg) scaleX(1); } }
+@keyframes ab-firefly-rise {
+    from { transform: translate3d(0,calc(100vh + 80px),0); }
+    to { transform: translate3d(var(--ab-fall-drift),-20px,0); }
+}
+@keyframes ab-firefly-glow { from { opacity: .08;transform: scale(.55); }to { opacity: .75;transform: scale(1); } }
+@keyframes ab-nebula-pan { from { transform: scale(1.015) translate(.3%,0); }to { transform: scale(1.07) translate(-.8%,-.3%); } }
+@keyframes ab-hero-arrive { from { opacity: 0;transform: translateY(14px); }to { opacity: 1;transform: translateY(0); } }
+@keyframes ab-caret-blink { 50% { opacity: 0; } }
+@media (max-width: 768px) {
+    .ab-motion-enabled #ab-space-hero .ab-nebula-image { animation-duration: 28s; }
+    .ab-fall-particle { opacity: .45; }
+}
+@media print {
+    #ab-ambient-effects,.ab-typewriter-caret { display: none !important; }
+    #ab-space-hero :is(.ab-nebula-image,.ab-hero-copy) { animation: none !important; }
+}
+
 /* ---------- Motion：尊重减弱动效偏好 ---------- */
 @media (prefers-reduced-motion: reduce) {
+    #ab-ambient-effects,.ab-typewriter-caret { display: none !important; }
+    #ab-space-hero :is(.ab-nebula-image,.ab-hero-copy) { animation: none !important; }
     #ab-pointer-light { display: none !important; }
     .ab-stars-depth-0, .ab-stars-depth-1, .ab-shooting-star { animation: none !important; }
     #ab-space-hero *, body:has(#ab-space-hero) .post_cover img { transition: none !important; }

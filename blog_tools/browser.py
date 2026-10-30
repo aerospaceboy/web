@@ -109,8 +109,11 @@ class Browser:
             if committed and self.evaluate("document.readyState === 'complete' && location.href !== 'about:blank'"):
                 self.evaluate("Promise.race([document.fonts.ready.then(() => true), "
                               "new Promise(r => setTimeout(() => r(false), 2000))])", promise=True)
-                self.evaluate("new Promise(resolve => requestAnimationFrame(() => "
-                              "requestAnimationFrame(() => resolve(true))))", promise=True)
+                # Animation frames are only a layout-settling aid. Keep this
+                # bounded even when the browser temporarily stops producing them.
+                self.evaluate("Promise.race([new Promise(resolve => requestAnimationFrame(() => "
+                              "requestAnimationFrame(() => resolve(true)))), "
+                              "new Promise(resolve => setTimeout(() => resolve(false), 1000))])", promise=True)
                 return
             time.sleep(0.1)
         raise RuntimeError("Page did not finish loading")

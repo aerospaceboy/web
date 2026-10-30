@@ -66,7 +66,7 @@
             </div>
             <button class="ab-calm-switch" type="button" role="switch" aria-checked="false" data-ab-calm>
                 <span>减少装饰动效</span><span class="ab-switch-state"></span>
-            </button><p class="ab-preference-note"></p>`;
+            </button><div data-ab-motion-settings></div><p class="ab-preference-note"></p>`;
         return content;
     };
     const install = () => {
@@ -109,7 +109,7 @@
                 if (url) navigation.append(link(url, label, glyph));
             }
             const preferences = document.createElement('section');preferences.id = 'ab-preferences-card';preferences.className = 'card-widget ab-hub-card';
-            preferences.innerHTML = '<h2 class="ab-widget-title"><span aria-hidden="true">Aa</span> 阅读偏好</h2>';
+            preferences.innerHTML = '<h2 class="ab-widget-title"><span aria-hidden="true">Aa</span> 阅读与特效</h2>';
             preferences.append(settings());
             if (profile) profile.after(card, preferences);else aside.prepend(card, preferences);
         }

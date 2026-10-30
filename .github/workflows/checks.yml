@@ -32,3 +32,4 @@ jobs:
       - run: node --check customization/pointer-effects.js
       - run: node --check customization/resume-enhancement.js
       - run: node --check customization/site-hub.js
+      - run: node --check customization/motion-effects.js

@@ -58,7 +58,7 @@ class BuildTests(unittest.TestCase):
             root = Path(directory)
             (root / 'customization').mkdir()
             for name in ['mobile-navigation', 'header-layout', 'space-effects',
-                         'pointer-effects', 'resume-enhancement', 'site-hub']:
+                         'pointer-effects', 'resume-enhancement', 'site-hub', 'motion-effects']:
                 (root / f'customization/{name}.js').write_text('', encoding='utf-8')
             for source in ["for (const row of [['/projects'], ['/resume']]) {}",
                            "const label = '[(${expression})]';"]:
