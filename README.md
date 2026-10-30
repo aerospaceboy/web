@@ -120,6 +120,8 @@ Pjax 返回首页时恢复单一实例；不可见时暂停动态星点，系统
 
 ## 状态与恢复
 
+现有登录历史可使用只读核查工具 `tools/login_evidence.py` 整理。`collect` 必须在已授权的 Halo 服务器运行，通过只读 PostgreSQL 查询和日志读取输出 JSON；`report --input 私有数据.json --output reports/login-records.html` 在本机生成表格。该工具不安装插件、不记录未来事件，也不把设备状态或 HTTP 302 当作完整登录历史。个人账号/IP 数据留在被忽略的 `reports/`，核查结论见 [服务器核查](docs/login-evidence-20261030.md)。
+
 当前维护情况见 [status.md](docs/status.md)。完整恢复需要 Halo 备份、数据库、附件及实际部署资料，见 [recovery.md](docs/recovery.md)；历史 JSON 不能代替恢复演练。
 
 主题元信息和相关资料保留原作者信息，原主题使用条件以其上游项目为准。
