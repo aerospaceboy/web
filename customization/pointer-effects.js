@@ -44,7 +44,7 @@
     const sync = () => {
         hide();
         if (!document.body) return;
-        const allowed = fine.matches && !reduced.matches && !connection?.saveData;
+        const allowed = fine.matches && !reduced.matches && !connection?.saveData && !document.documentElement.classList.contains('ab-calm-mode');
         if (!allowed) {
             if (enabled) document.removeEventListener('pointermove', move);
             enabled = false;
@@ -70,6 +70,7 @@
     fine.addEventListener('change', sync);
     reduced.addEventListener('change', sync);
     connection?.addEventListener('change', sync);
+    document.addEventListener('ab:preferences', sync);
     document.addEventListener('pointerout', leave);
     window.addEventListener('blur', hide);
     document.addEventListener('visibilitychange', () => { if (document.hidden) hide(); });

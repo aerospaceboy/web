@@ -82,6 +82,14 @@ Pjax 返回首页时恢复单一实例；不可见时暂停动态星点，系统
 
 这是渐进增强：脚本不可用时展示 Hao 原始 Banner；背景文件失败时移除失效图片并保留暗色渐变、文字与入口。回退仅需恢复旧全局注入。
 
+## 社交入口与阅读偏好
+
+`customization/site-hub.js` 将 `config/site.json` 中的 `github_profile_url` 加到顶部工具栏、首页、作者卡片和手机菜单；GitHub 使用原生新标签页链接。首页和侧栏还提供已有 RSS 订阅入口。仅允许 HTTPS 的 GitHub 个人主页地址。
+
+首页侧栏包含项目、简历、归档、留言四个快捷入口，以及三档文章字号和“减少装饰动效”开关。手机菜单也可设置；文章页只添加可折叠阅读设置，保留原来的目录位置。字号只应用于文章，简历及其他页面保持原排版。
+
+偏好保存在当前浏览器的 `ab:reader:v1` 本地存储中，不记录阅读历史或发送统计请求；本地存储不可用时仍可在当前页面使用。系统减弱动效和节省流量的现有保护保持有效。本轮参考与验收见 [优化记录](docs/site-hub-20261030.md)。
+
 ## 文章封面
 
 七篇文章和默认占位图已使用本站附件，避免依赖随机图片服务。素材在 `customization/assets/covers/`，每张 WebP 约 19–26 KB，八张共 179088 字节。
@@ -103,6 +111,8 @@ Pjax 返回首页时恢复单一实例；不可见时暂停动态星点，系统
 .\.venv\Scripts\python.exe -m blog_tools.check_header --local-bundle
 .\.venv\Scripts\python.exe -m blog_tools.check_header
 .\.venv\Scripts\python.exe -m blog_tools.check_header --train-hover
+.\.venv\Scripts\python.exe -m blog_tools.check_site_hub --local-bundle
+.\.venv\Scripts\python.exe -m blog_tools.check_site_hub
 ```
 
 `--inject-css` 用于隔离浏览器预览，会在本地文档移除旧定制样式并添加新 CSS；不会修改服务器。桌面和移动视口分别设置设备参数，每次运行使用独立配置目录与动态调试端口，不复用个人浏览器登录状态。
@@ -112,6 +122,8 @@ Pjax 返回首页时恢复单一实例；不可见时暂停动态星点，系统
 `check_header --local-bundle` 在本机快照中保持线上 CSS/脚本顺序，仅替换两个定制块，不修改服务器；不带该参数时直接检查公网。默认按 390–1920 CSS 像素缩小并重新放大，检查主菜单与站点名/完整工具区是否相撞、是否换行，以及收起后菜单入口是否完整。当前导航由 `header-layout.js` 观察实际占用空间，空间不足时使用原生侧栏，避免浏览器放大后互相覆盖。
 
 `--train-hover` 额外检查 800、849、900、1100 和 1300 宽度下，小火车悬停不会移动按钮或切换导航模式。主题的悬停提示会临时隐藏菜单，宽度计算保留此前实际测量值；小火车外部随机跳转使用原生新标签页链接，保留本站页面。
+
+`check_site_hub` 检查实际 GitHub/RSS 目标、重复 Pjax 下的单实例、浅色卡片对比、动效关闭、字号保存及刷新、简历字号不变和手机菜单。检查使用临时浏览器，不修改个人浏览器的阅读偏好。构建同时拒绝 Thymeleaf 内联表达式起始符，避免普通 JS 嵌套数组意外触发 Halo 服务端模板解析。
 
 ## 简历页面维护
 

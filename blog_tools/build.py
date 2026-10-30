@@ -3,6 +3,7 @@
 import argparse
 import hashlib
 import json
+import re
 from pathlib import Path
 
 from . import configure_console
@@ -10,6 +11,13 @@ from .publish import ROOT, load_posts
 
 STYLE_ID = "aerospaceboy-global-style"
 NAV_ID = "aerospaceboy-mobile-navigation-script"
+
+
+def validate_injected_text(source):
+    # Halo processes global injection with Thymeleaf text inlining. A JS nested
+    # array written without whitespace can accidentally become an expression.
+    if any(marker in source for marker in ("[[", "[(")):
+        raise ValueError("Injected code contains a Thymeleaf inline-expression opener; separate the brackets")
 
 
 def navigation_source(config):
@@ -21,9 +29,15 @@ def navigation_source(config):
         if value and (not isinstance(value, str) or not value.startswith("/") or
                       value.startswith("//") or any(c in value for c in "\r\n<>\\")):
             raise ValueError("Public paths must be relative to the site origin")
+    github = config.get("github_profile_url", "")
+    if not isinstance(github, str) or (github and not re.fullmatch(r"https://github\.com/[A-Za-z0-9][A-Za-z0-9-]{0,38}/?", github)):
+        raise ValueError("GitHub destination must be an HTTPS profile on github.com")
+    settings["githubProfileUrl"] = github
     prefix = "window.__abPublicConfig = " + json.dumps(settings, ensure_ascii=True).replace("<", "\\u003c") + ";\n"
-    return prefix + "\n".join((ROOT / "customization" / name).read_text(encoding="utf-8")
-                               for name in ("mobile-navigation.js", "header-layout.js", "space-effects.js", "pointer-effects.js", "resume-enhancement.js"))
+    source = prefix + "\n".join((ROOT / "customization" / name).read_text(encoding="utf-8")
+                               for name in ("mobile-navigation.js", "header-layout.js", "space-effects.js", "pointer-effects.js", "resume-enhancement.js", "site-hub.js"))
+    validate_injected_text(source)
+    return source
 
 
 def build(output=ROOT / "build", config_path=ROOT / "config/site.json"):
@@ -32,6 +46,7 @@ def build(output=ROOT / "build", config_path=ROOT / "config/site.json"):
     css = (ROOT / "customization/aerospaceboy-custom.css").read_text(encoding="utf-8")
     if "</style" in css.lower():
         raise ValueError("CSS contains a closing style tag")
+    validate_injected_text(css)
     digest = hashlib.sha256(css.encode("utf-8")).hexdigest()
     navigation = navigation_source(config)
     if "</script" in navigation.lower():

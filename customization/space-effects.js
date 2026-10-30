@@ -72,7 +72,7 @@
             }
             home.prepend(hero);
             hero.addEventListener('pointermove', event => {
-                if (reduced.matches || !finePointer.matches || navigator.connection?.saveData || frame) return;
+                if (reduced.matches || document.documentElement.classList.contains('ab-calm-mode') || !finePointer.matches || navigator.connection?.saveData || frame) return;
                 const x = event.clientX;
                 const y = event.clientY;
                 frame = requestAnimationFrame(() => {

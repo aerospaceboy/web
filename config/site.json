@@ -7,5 +7,6 @@
   "default_cover_path": "/upload/ab-cover-default-v1.webp",
   "license_url": "https://creativecommons.org/licenses/by-nc-nd/4.0/deed.zh-hans",
   "nebula_background_path": "/upload/ab-nebula-night-v1.webp",
-  "resume_path": "/resume"
+  "resume_path": "/resume",
+  "github_profile_url": "https://github.com/aerospaceboy"
 }
