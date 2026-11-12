@@ -1,54 +1,35 @@
-# Projects 页面内容（粘贴到 Halo Console）
-
-## 创建页面步骤
-
-1. Console → 页面 → 新建
-2. 标题：`Projects`，别名/slug：`projects`（路径即 `/projects`）
-3. 模板：保持默认 page.html（Hao 无专用项目模板）
-4. 发布后：外观 → 菜单 → 主菜单添加"项目 → /projects"
-
-## 页面骨架（直接粘贴正文，后续逐项补充）
-
-```markdown
 # Projects
 
-记录我在嵌入式、AI、机器人、FPGA 与自动化方向上的项目实践。
-（以下为分类占位，具体项目会陆续补充。）
+这里记录正在进行、已经完成以及持续迭代中的技术项目。
+
+## 智巡未来：月面仓储自主分拣搬运机器人
+
+[![智巡未来项目展示封面](/upload/clipboard.png)](/archives/yzbot-lunar-warehouse)
+
+2026 大模型技术创新赛项目。基于 ROS 2 与 Gazebo，将题意解析、任务规划、导航、视觉定位和机械臂抓放串联为可观察、可核对的仿真作业流程。
+
+**技术栈**：ROS 2 · Gazebo · Nav2 · MoveIt 2 · RGB-D · CoStudio
+
+[查看项目介绍与六张展示图 →](/archives/yzbot-lunar-warehouse)
 
 ## Edge AI
 
-Orange Pi / RK3588 / YOLO 等边缘 AI 项目。
-
-- （待补充）
+Orange Pi / RK3588 上的边缘推理与视频流处理。
 
 ## Embedded
 
-STM32 / 51 / ESP32 / Renesas 等嵌入式开发。
-
-- （待补充）
+STM32 / 51 / ESP32 与嵌入式 Linux 的驱动与外设实践。
 
 ## Robotics
 
-ROS2 / 机器人相关开发。
-
-- （待补充）
+ROS2 机器人软件架构、感知与控制。
 
 ## FPGA
 
-FPGA / 数字系统相关项目。
-
-- （待补充）
+数字逻辑、通信接口与 HDL 工程实现。
 
 ## Automation
 
-自动化、控制与智能产线相关项目。
+自动控制、工业自动化与智能产线。
 
-- （待补充）
-```
-
-## 写作约定（供后续自己填）
-
-- 每个项目一小节：一句话简介 + 硬件/软件栈 + 状态（进行中/完成）
-- 不写没核实的性能数字；有实测再加
-- 相关博文用 Halo 内链指向 /archives 对应文章
-- 涉及 Orange Pi / RK3588 的项目可加标签 `Orange Pi`、`RK3588` 便于归档
+> 项目内容会持续更新，具体链接与进展在对应文章里展开。

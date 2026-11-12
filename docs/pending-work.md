@@ -1,5 +1,10 @@
 # 待恢复事项（2026-10-29）
 
+## 2026-11-12 比赛项目发布
+
+- 用户确认仅公开项目介绍和展示图。现已发布[智巡未来项目文章](https://aerospaceboy.site/archives/yzbot-lunar-warehouse)，六张图片原字节与公网 SHA256 一致；[项目页](https://aerospaceboy.site/projects)已添加封面与文章入口，并保留原有内容。
+- 文章和项目页均完成保存重开、发布及公网回读；用户确认安装的官方 ByteMD 1.10.0 已启用。部署清单、源文和验证范围见 [发布记录](aic-project-publication-20261112.md)。
+
 ## 2026-10-30 恢复结果
 
 - 新版简历更新已完成：用户提供的一页 PDF 已按原字节上传，网页号码与拨号链接已修正，下载改为附件库中的新版原件。保存重开及公网回读均核对 44 个字段，PDF 大小/MIME/SHA256 与用户原件一致，旧 PDF 保留。最新私有结构化数据为 `backups/resume-20261030/resume.json`，实际下载路径与校验值见 `config/resume-deployment.json`，详情见 [新版更新记录](resume-update-20261030.md)。

@@ -1,0 +1,64 @@
+{
+  "title": "智巡未来：面向月面仓储的自主分拣搬运机器人",
+  "path": "/archives/yzbot-lunar-warehouse",
+  "post_name": "01a1cf74-4e3f-73e2-a608-2ce058c245ac",
+  "source": "content/projects/yzbot-lunar-warehouse.md",
+  "project_page": "/projects",
+  "project_page_name": "singlepage-dsvfvocd",
+  "project_page_source": "customization/projects.md",
+  "cover": "/upload/clipboard.png",
+  "categories": [
+    "project-log",
+    "ai"
+  ],
+  "tags": [
+    "ros2",
+    "ai"
+  ],
+  "published_on": "2026-11-12",
+  "scope": "项目介绍与六张展示图",
+  "assets": [
+    {
+      "url": "/upload/clipboard.png",
+      "sha256": "444daa5426145724d9404421f3687417963300dce38771df68a6ab2f8f33935d",
+      "bytes": 280107,
+      "mime": "image/png",
+      "name": "ab-aic-yzbot-cover-v1.png"
+    },
+    {
+      "url": "/upload/clipboard-ieLQ.png",
+      "sha256": "9ce964004bc9e373b759f89b5e19fe671530b941b69e348dbc09dea3a2625681",
+      "bytes": 304237,
+      "mime": "image/png",
+      "name": "ab-aic-yzbot-robot-v1.png"
+    },
+    {
+      "url": "/upload/clipboard-CGdQ.png",
+      "sha256": "3ddfb53b89b05d3abfd0bae9dcd048b39cf574abb5435e47dca2f4bb5fb32d57",
+      "bytes": 94242,
+      "mime": "image/png",
+      "name": "ab-aic-yzbot-navigation-v1.png"
+    },
+    {
+      "url": "/upload/clipboard-nVsr.png",
+      "sha256": "ae827f5204826cd869036753fcb1e55336505beec7ce7c5f9fc7f127e5f4c293",
+      "bytes": 65041,
+      "mime": "image/png",
+      "name": "ab-aic-yzbot-perception-v1.png"
+    },
+    {
+      "url": "/upload/clipboard-toMJ.png",
+      "sha256": "b98e5f81afb6323b204562b53a5b9219e05e0e4fd14d773f19847e34b97a05dd",
+      "bytes": 234762,
+      "mime": "image/png",
+      "name": "ab-aic-yzbot-manipulation-v1.png"
+    },
+    {
+      "url": "/upload/clipboard-BNIK.png",
+      "sha256": "59f4fd142e59300930cfabc2829678ccbe43312f79fe32521193514d3d31de69",
+      "bytes": 662450,
+      "mime": "image/png",
+      "name": "ab-aic-yzbot-dashboard-v1.png"
+    }
+  ]
+}
