@@ -1,5 +1,10 @@
 # 待恢复事项（2026-10-29）
 
+## 2026-11-14 FPGA 比赛项目发布
+
+- 已发布 [AFDX 双网端系统项目文章](https://aerospaceboy.site/archives/fpga-afdx-end-system)，包含介绍、四张展示图、性能表与 GitHub 仓库入口；[项目页](https://aerospaceboy.site/projects)已添加项目入口并保留智巡未来和原有技术方向。
+- 用户自行登录后恢复部署。正文、项目页保存重开核对，公开页面及四张原图通过 HTTP、大小、MIME 与 SHA256 核验；展示图均为已有日志/波形可视化。见 [发布记录](fpga-project-publication-20261114.md)。
+
 ## 2026-11-12 比赛项目发布
 
 - 用户确认仅公开项目介绍和展示图。现已发布[智巡未来项目文章](https://aerospaceboy.site/archives/yzbot-lunar-warehouse)，六张图片原字节与公网 SHA256 一致；[项目页](https://aerospaceboy.site/projects)已添加封面与文章入口，并保留原有内容。

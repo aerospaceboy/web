@@ -1,0 +1,50 @@
+{
+  "title": "AFDX 双网端系统：从 FPGA 协议实现到长消息完整交付",
+  "path": "/archives/fpga-afdx-end-system",
+  "post_name": "01a1cf8b-a414-73f9-93a9-4750d395bf41",
+  "source": "content/projects/fpga-afdx-end-system.md",
+  "project_page": "/projects",
+  "project_page_name": "singlepage-dsvfvocd",
+  "project_page_source": "customization/projects.md",
+  "cover": "/upload/clipboard-JcVm.png",
+  "categories": [
+    "project-log",
+    "contest-log"
+  ],
+  "tags": [
+    "fpga"
+  ],
+  "github_url": "https://github.com/aerospaceboy/FPGA",
+  "published_on": "2026-11-14",
+  "scope": "项目介绍与四张日志或波形数据可视化",
+  "assets": [
+    {
+      "name": "ab-fpga-afdx-overview-v1.png",
+      "bytes": 134252,
+      "sha256": "898863acf7a74ce768c2953ab33f792f333126a02c3cd9b1e3c7d89cd8ff3e7d",
+      "mime": "image/png",
+      "url": "/upload/clipboard-JcVm.png"
+    },
+    {
+      "name": "ab-fpga-afdx-fragmentation-v1.png",
+      "bytes": 83815,
+      "sha256": "d202a85c47963a18d388eda74be03120b284224b197f8140e323378576d02e30",
+      "mime": "image/png",
+      "url": "/upload/clipboard-arsI.png"
+    },
+    {
+      "name": "ab-fpga-afdx-performance-v1.png",
+      "bytes": 106637,
+      "sha256": "2a2f5b102853e4ca27a43b47decb94cb31ec5497cc1d39c8c06a5da20965ad71",
+      "mime": "image/png",
+      "url": "/upload/clipboard-ycmH.png"
+    },
+    {
+      "name": "ab-fpga-afdx-verification-v1.png",
+      "bytes": 152811,
+      "sha256": "4c617f0a6e0e26fbc98e8ab1cfb15e5c8106c03110aad59429c2d0458f702a66",
+      "mime": "image/png",
+      "url": "/upload/clipboard-Kyyr.png"
+    }
+  ]
+}

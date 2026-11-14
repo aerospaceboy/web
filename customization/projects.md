@@ -2,6 +2,17 @@
 
 这里记录正在进行、已经完成以及持续迭代中的技术项目。
 
+## AFDX 双网端系统：FPGA 航空通信项目
+
+[![AFDX 双网端系统项目总览](/upload/clipboard-JcVm.png)](/archives/fpga-afdx-end-system)
+
+全国大学生嵌入式芯片与系统设计竞赛 FPGA 赛道项目。围绕虚拟链路调度、双网冗余、IPv4 分片重组和完整消息交付展开，结合 eLinx、ModelSim 与归档记录展示实现和验证过程。
+
+**技术栈**：Verilog HDL · FPGA · eLinx · ModelSim · AFDX · GMII
+
+[查看项目介绍与四张展示图 →](/archives/fpga-afdx-end-system) · [GitHub 项目仓库 →](https://github.com/aerospaceboy/FPGA)
+
+
 ## 智巡未来：月面仓储自主分拣搬运机器人
 
 [![智巡未来项目展示封面](/upload/clipboard.png)](/archives/yzbot-lunar-warehouse)
