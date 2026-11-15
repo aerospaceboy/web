@@ -8,5 +8,40 @@
   "license_url": "https://creativecommons.org/licenses/by-nc-nd/4.0/deed.zh-hans",
   "nebula_background_path": "/upload/ab-nebula-night-v1.webp",
   "resume_path": "/resume",
-  "github_profile_url": "https://github.com/aerospaceboy"
+  "github_profile_url": "https://github.com/aerospaceboy",
+  "featured_projects": [
+    {
+      "title": "AFDX 双网端系统",
+      "label": "FPGA · 航空通信",
+      "summary": "围绕双网冗余与 IPv4 分片重组，让应用消息经过协议链路后完整、唯一地交付。",
+      "path": "/archives/fpga-afdx-end-system",
+      "image": "/upload/clipboard-JcVm.png",
+      "github": "https://github.com/aerospaceboy/FPGA",
+      "tags": [
+        "Verilog HDL",
+        "FPGA",
+        "ModelSim"
+      ],
+      "focus": "虚拟链路调度、双网收发、长消息重组",
+      "scope": "软件综合、RTL 与网表仿真；指标限定于归档网络计划",
+      "version": "2026-10-31 归档资料",
+      "status": "比赛项目记录"
+    },
+    {
+      "title": "智巡未来",
+      "label": "ROS 2 · 自主机器人",
+      "summary": "把题意解析、导航、视觉定位与机械臂抓放串联为可观察、可核对的仓储作业流程。",
+      "path": "/archives/yzbot-lunar-warehouse",
+      "image": "/upload/clipboard.png",
+      "tags": [
+        "ROS 2",
+        "Nav2",
+        "MoveIt 2"
+      ],
+      "focus": "任务协调、导航对接、RGB-D 定位与抓取",
+      "scope": "Gazebo 仿真集成与任务展示；实物能力另行验证",
+      "version": "2026 比赛项目资料",
+      "status": "仿真项目记录"
+    }
+  ]
 }

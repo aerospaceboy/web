@@ -8,6 +8,7 @@ from pathlib import Path
 
 from . import configure_console
 from .publish import ROOT, load_posts
+from .portfolio import render_projects, validate_projects
 
 STYLE_ID = "aerospaceboy-global-style"
 NAV_ID = "aerospaceboy-mobile-navigation-script"
@@ -33,9 +34,10 @@ def navigation_source(config):
     if not isinstance(github, str) or (github and not re.fullmatch(r"https://github\.com/[A-Za-z0-9][A-Za-z0-9-]{0,38}/?", github)):
         raise ValueError("GitHub destination must be an HTTPS profile on github.com")
     settings["githubProfileUrl"] = github
+    settings["featuredProjects"] = validate_projects(config.get("featured_projects", []))
     prefix = "window.__abPublicConfig = " + json.dumps(settings, ensure_ascii=True).replace("<", "\\u003c") + ";\n"
     source = prefix + "\n".join((ROOT / "customization" / name).read_text(encoding="utf-8")
-                               for name in ("mobile-navigation.js", "header-layout.js", "space-effects.js", "pointer-effects.js", "resume-enhancement.js", "site-hub.js", "motion-effects.js"))
+                               for name in ("mobile-navigation.js", "header-layout.js", "space-effects.js", "pointer-effects.js", "resume-enhancement.js", "site-hub.js", "motion-effects.js", "portfolio.js"))
     validate_injected_text(source)
     return source
 
@@ -58,6 +60,7 @@ def build(output=ROOT / "build", config_path=ROOT / "config/site.json"):
         f'<script id="{NAV_ID}" data-ab-sha256="{navigation_digest}">\n{navigation}</script>\n', encoding="utf-8")
     (output / "about-excerpt.txt").write_text(config["about_description"] + "\n", encoding="utf-8")
     (output / "site-description.txt").write_text(config["site_description"] + "\n", encoding="utf-8")
+    (output / "projects-body.html").write_text(render_projects(config.get("featured_projects", [])), encoding="utf-8")
     plan = {"base_url": config["base_url"], "css_sha256": digest,
             "navigation_sha256": navigation_digest,
             "global_head_file": "global-head.html", "about_excerpt_file": "about-excerpt.txt",
