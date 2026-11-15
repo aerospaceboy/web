@@ -1,5 +1,9 @@
 # 全站样式与 SEO 部署
 
+## 2026-11 导航与身份数据补充
+
+当前构建还包含 `navigation-accessibility.js` 和 `aerospaceboy-site-identity` JSON-LD。更新时替换原有自有 CSS/JS 块，同时更新或首次追加该身份脚本，各保留一份；保留其他注入。身份数据描述网站与公开作者，不是逐页 canonical 或文章 Schema。后台保存重开及公开原始 HTML 都须核对。实施、回退与验收范围见 [第二批优化记录](navigation-optimization-20261115.md)。
+
 本仓库包含修复后的代码和可生成的部署文件。GitHub 推送不会自动修改 Halo 数据；后台保存和公网验收是独立步骤。
 
 ## 生成可检查文件

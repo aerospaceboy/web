@@ -9,6 +9,7 @@ from pathlib import Path
 from . import configure_console
 from .publish import ROOT, load_posts
 from .portfolio import render_projects, validate_projects
+from .seo import SEO_ID, identity_json
 
 STYLE_ID = "aerospaceboy-global-style"
 NAV_ID = "aerospaceboy-mobile-navigation-script"
@@ -37,7 +38,7 @@ def navigation_source(config):
     settings["featuredProjects"] = validate_projects(config.get("featured_projects", []))
     prefix = "window.__abPublicConfig = " + json.dumps(settings, ensure_ascii=True).replace("<", "\\u003c") + ";\n"
     source = prefix + "\n".join((ROOT / "customization" / name).read_text(encoding="utf-8")
-                               for name in ("mobile-navigation.js", "header-layout.js", "space-effects.js", "pointer-effects.js", "resume-enhancement.js", "site-hub.js", "motion-effects.js", "portfolio.js"))
+                               for name in ("mobile-navigation.js", "header-layout.js", "space-effects.js", "pointer-effects.js", "resume-enhancement.js", "site-hub.js", "motion-effects.js", "portfolio.js", "navigation-accessibility.js"))
     validate_injected_text(source)
     return source
 
@@ -54,10 +55,13 @@ def build(output=ROOT / "build", config_path=ROOT / "config/site.json"):
     if "</script" in navigation.lower():
         raise ValueError("Navigation contains a closing script tag")
     navigation_digest = hashlib.sha256(navigation.encode("utf-8")).hexdigest()
+    identity = identity_json(config)
+    validate_injected_text(identity)
     output.mkdir(parents=True, exist_ok=True)
     (output / "global-head.html").write_text(
         f'<style id="{STYLE_ID}" data-ab-sha256="{digest}">\n{css}</style>\n'
-        f'<script id="{NAV_ID}" data-ab-sha256="{navigation_digest}">\n{navigation}</script>\n', encoding="utf-8")
+        f'<script id="{NAV_ID}" data-ab-sha256="{navigation_digest}">\n{navigation}</script>\n'
+        f'<script id="{SEO_ID}" type="application/ld+json">\n{identity}\n</script>\n', encoding="utf-8")
     (output / "about-excerpt.txt").write_text(config["about_description"] + "\n", encoding="utf-8")
     (output / "site-description.txt").write_text(config["site_description"] + "\n", encoding="utf-8")
     (output / "projects-body.html").write_text(render_projects(config.get("featured_projects", [])), encoding="utf-8")

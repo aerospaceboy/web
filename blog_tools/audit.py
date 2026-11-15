@@ -15,6 +15,7 @@ from . import configure_console
 from .build import NAV_ID, STYLE_ID, navigation_source
 from .halo import validate_base_url
 from .publish import ROOT
+from .seo import SEO_ID, site_identity
 
 
 class PageMetadata(HTMLParser):
@@ -24,6 +25,7 @@ class PageMetadata(HTMLParser):
         self.styles = []
         self.legacy_styles = 0
         self.navigation = []
+        self.identities = []
         self.links = []
         self.cover_sources = []
         self._style_attrs = None
@@ -48,8 +50,11 @@ class PageMetadata(HTMLParser):
             self._style_text = []
             if attrs.get("id") == STYLE_ID:
                 self.styles.append(attrs)
-        if tag == "script" and attrs.get("id") == NAV_ID:
-            self.navigation.append(attrs)
+        if tag == "script" and attrs.get("id") in {NAV_ID, SEO_ID}:
+            if attrs.get('id') == NAV_ID:
+                self.navigation.append(attrs)
+            else:
+                self.identities.append(attrs)
             self._script_attrs = attrs
             self._script_text = []
 
@@ -67,6 +72,8 @@ class PageMetadata(HTMLParser):
             self._style_attrs = None
         if tag == "script" and self._script_attrs is not None:
             self._script_attrs["actual_sha256"] = content_hash("".join(self._script_text))
+            if self._script_attrs.get('id') == SEO_ID:
+                self._script_attrs['json_text'] = ''.join(self._script_text)
             self._script_attrs = None
 
 
@@ -137,6 +144,16 @@ def inspect_html(path, source, config, digest, navigation_digest=None, covers=No
     page.feed(source)
     issues = []
     warnings = []
+    if config.get('site_title'):
+        if len(page.identities) != 1:
+            issues.append('expected_one_site_identity')
+        else:
+            identity = page.identities[0]
+            try:
+                if identity.get('type') != 'application/ld+json' or json.loads(identity.get('json_text', '')) != site_identity(config):
+                    issues.append('site_identity_mismatch')
+            except (ValueError, TypeError):
+                issues.append('site_identity_invalid_json')
     if path == config.get('privacy_policy_path') and '请在此处添加你的隐私政策内容' in source:
         warnings.append('privacy_policy_placeholder_content')
     if len(page.styles) != 1:
@@ -185,6 +202,7 @@ def inspect_html(path, source, config, digest, navigation_digest=None, covers=No
             "description": page.meta.get("description", []),
             "og_description": page.meta.get("og:description", []),
             "global_style_count": len(page.styles), "cover_sources": page.cover_sources,
+            "site_identity_count": len(page.identities),
             "client_link_rewrites": client_rewrites}
 
 
@@ -197,6 +215,7 @@ def audit(config):
     covers_path = ROOT / 'config/covers.json'
     covers = json.loads(covers_path.read_text(encoding='utf-8-sig')) if covers_path.exists() else None
     paths = ["/", "/archives", "/projects", "/about", "/archives/pid-control-intro", "/rss.xml", "/sitemap.xml"]
+    paths.extend(project['path'] for project in config.get('featured_projects', []))
     if covers is not None:
         paths.extend('/archives/' + slug for slug in covers if slug != 'default')
     if config.get('privacy_policy_path'):
