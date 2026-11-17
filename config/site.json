@@ -4,6 +4,7 @@
   "site_title": "半截的诗",
   "author_name": "AerospaceBoy",
   "page_metadata_enabled": true,
+  "share_metadata_enabled": true,
   "site_description": "记录嵌入式、人工智能、机器人、自动化与项目开发中的学习和实践。",
   "about_description": "关于半截的诗 AerospaceBoy：分享嵌入式、人工智能、ROS2、FPGA、边缘计算与自动化领域的学习和项目实践。",
   "privacy_policy_path": "/privacy-policy",

@@ -203,6 +203,27 @@ def inspect_page_metadata(path, page, config):
     return issues
 
 
+def inspect_share_metadata(path, page, base):
+    issues = []
+    expected = base.rstrip('/') + path
+    for name in ('og:url', 'twitter:url'):
+        if page.meta.get(name) != [expected]:
+            issues.append(name + '_mismatch')
+    images = []
+    for name in ('og:image', 'twitter:image'):
+        values = page.meta.get(name, [])
+        if len(values) != 1:
+            issues.append(name + '_missing_or_duplicate')
+            continue
+        parsed = urlsplit(values[0])
+        if parsed.scheme != 'https' or not parsed.hostname or parsed.username or parsed.password:
+            issues.append(name + '_not_absolute_https')
+        images.append(values[0])
+    if len(images) == 2 and images[0] != images[1]:
+        issues.append('social_cover_mismatch')
+    return issues
+
+
 def inspect_html(path, source, config, digest, navigation_digest=None, covers=None):
     page = PageMetadata()
     page.feed(source)
@@ -210,6 +231,8 @@ def inspect_html(path, source, config, digest, navigation_digest=None, covers=No
     warnings = []
     if config.get('page_metadata_enabled'):
         issues.extend(inspect_page_metadata(path, page, config))
+    if config.get('share_metadata_enabled'):
+        issues.extend(inspect_share_metadata(path, page, config['base_url']))
     if config.get('site_title'):
         if len(page.identities) != 1:
             issues.append('expected_one_site_identity')

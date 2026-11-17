@@ -33,3 +33,13 @@ class ThemeDeploymentTests(unittest.TestCase):
                     deployment.main()
                 ssh.assert_not_called()
             self.assertEqual(receipt.read_bytes(), original)
+
+    def test_rollback_cannot_use_receipt_from_another_profile(self):
+        with tempfile.TemporaryDirectory() as directory:
+            receipt = Path(directory) / 'receipt.json'
+            receipt.write_text(json.dumps({'root': deployment.THEME, 'files': dict.fromkeys(deployment.ALLOWED)}), encoding='utf-8')
+            argv = ['deploy_theme_metadata.py', '--profile', 'share', '--rollback', '--bind-address', '127.0.0.1', '--receipt', str(receipt)]
+            with patch('sys.argv', argv), patch.object(deployment.subprocess, 'run') as ssh:
+                with self.assertRaisesRegex(ValueError, 'Unexpected receipt'):
+                    deployment.main()
+                ssh.assert_not_called()

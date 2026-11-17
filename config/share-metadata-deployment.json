@@ -1,0 +1,10 @@
+{
+  "theme": "theme-hao",
+  "theme_version": "1.7.3",
+  "installed_date": "2026-11-17",
+  "files": {
+    "modules/common/open-graph.html": "3b33bb2bd35277cabbc779b47b90b36c76d7cabdc4beef77e83495a3d95e55e8"
+  },
+  "private_receipt": "backups/share-20261117/receipt.json",
+  "requires_template_cache_refresh": true
+}
