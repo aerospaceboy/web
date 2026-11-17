@@ -2,9 +2,11 @@
 
 import argparse
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
 import hashlib
 from html.parser import HTMLParser
 import json
+import re
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.parse import urljoin, urlsplit
@@ -26,6 +28,10 @@ class PageMetadata(HTMLParser):
         self.legacy_styles = 0
         self.navigation = []
         self.identities = []
+        self.page_schemas = []
+        self.page_markers = []
+        self.canonicals = []
+        self.image_preloads = []
         self.links = []
         self.cover_sources = []
         self._style_attrs = None
@@ -35,6 +41,12 @@ class PageMetadata(HTMLParser):
 
     def handle_starttag(self, tag, attrs):
         attrs = dict(attrs)
+        if tag == 'link' and attrs.get('rel') == 'canonical':
+            self.canonicals.append(attrs.get('href', ''))
+        if tag == 'link' and attrs.get('rel') == 'preload' and attrs.get('as') == 'image':
+            self.image_preloads.append(attrs.get('href', ''))
+        if tag == 'meta' and attrs.get('id') == 'ab-page-metadata':
+            self.page_markers.append(attrs)
         if tag == "a" and attrs.get("href"):
             self.links.append(attrs["href"])
         if tag == "img" and ('post_bg' in attrs.get('class', '').split() or attrs.get('alt') == 'cover'):
@@ -50,11 +62,13 @@ class PageMetadata(HTMLParser):
             self._style_text = []
             if attrs.get("id") == STYLE_ID:
                 self.styles.append(attrs)
-        if tag == "script" and attrs.get("id") in {NAV_ID, SEO_ID}:
+        if tag == "script" and attrs.get("id") in {NAV_ID, SEO_ID, 'ab-page-schema'}:
             if attrs.get('id') == NAV_ID:
                 self.navigation.append(attrs)
-            else:
+            elif attrs.get('id') == SEO_ID:
                 self.identities.append(attrs)
+            else:
+                self.page_schemas.append(attrs)
             self._script_attrs = attrs
             self._script_text = []
 
@@ -72,7 +86,7 @@ class PageMetadata(HTMLParser):
             self._style_attrs = None
         if tag == "script" and self._script_attrs is not None:
             self._script_attrs["actual_sha256"] = content_hash("".join(self._script_text))
-            if self._script_attrs.get('id') == SEO_ID:
+            if self._script_attrs.get('id') in {SEO_ID, 'ab-page-schema'}:
                 self._script_attrs['json_text'] = ''.join(self._script_text)
             self._script_attrs = None
 
@@ -139,11 +153,63 @@ def content_hash(text):
     return hashlib.sha256((text.replace("\r\n", "\n").strip() + "\n").encode("utf-8")).hexdigest()
 
 
+def inspect_page_metadata(path, page, config):
+    """Check real response HTML independently of browser metadata synchronization."""
+    issues = []
+    base = config['base_url'].rstrip('/')
+    if len(page.page_markers) != 1:
+        return ['expected_one_page_metadata_marker']
+    marker = page.page_markers[0]
+    article = bool(re.fullmatch(r'/archives/[A-Za-z][A-Za-z0-9_-]*', path))
+    content_paths = {'/', '/projects', '/about', config.get('privacy_policy_path'), config.get('resume_path')}
+    expected = base + path if article or path in content_paths or marker.get('data-canonical') else None
+    if expected and (page.canonicals != [expected] or marker.get('data-canonical') != expected):
+        issues.append('page_canonical_mismatch')
+    elif not expected and page.canonicals:
+        issues.append('unexpected_collection_canonical')
+    if path == '/' and page.image_preloads.count(config.get('nebula_background_path')) != 1:
+        issues.append('hero_preload_missing_or_duplicate')
+    if not article:
+        if page.page_schemas:
+            issues.append('article_schema_on_non_article')
+        return issues
+    if marker.get('data-kind') != 'post' or len(page.page_schemas) != 1:
+        return issues + ['expected_one_article_schema']
+    try:
+        record = page.page_schemas[0]
+        schema = json.loads(record.get('json_text', ''))
+        if (record.get('type') != 'application/ld+json' or schema.get('@type') != 'BlogPosting' or
+                schema.get('@context') != 'https://schema.org' or schema.get('url') != expected or
+                schema.get('mainEntityOfPage') != expected):
+            issues.append('article_schema_identity_mismatch')
+        headline = schema.get('headline')
+        if not headline or page.meta.get('og:title') != [headline] or headline != marker.get('data-headline'):
+            issues.append('article_schema_headline_mismatch')
+        author = schema.get('author', {})
+        if (author.get('@type') != 'Person' or not author.get('name') or
+                author.get('name') != marker.get('data-author-name') or
+                author.get('url') != marker.get('data-author-url') or
+                urlsplit(author.get('url', '')).netloc != urlsplit(base).netloc):
+            issues.append('article_schema_author_mismatch')
+        for key, attribute in [('datePublished', 'data-published'), ('dateModified', 'data-modified')]:
+            value = schema.get(key)
+            if not value or value != marker.get(attribute) or datetime.fromisoformat(value.replace('Z', '+00:00')).tzinfo is None:
+                issues.append('article_schema_date_mismatch')
+        image = marker.get('data-image')
+        if schema.get('image') != ([image] if image else []):
+            issues.append('article_schema_image_mismatch')
+    except (ValueError, TypeError, AttributeError):
+        issues.append('article_schema_invalid_json_or_fields')
+    return issues
+
+
 def inspect_html(path, source, config, digest, navigation_digest=None, covers=None):
     page = PageMetadata()
     page.feed(source)
     issues = []
     warnings = []
+    if config.get('page_metadata_enabled'):
+        issues.extend(inspect_page_metadata(path, page, config))
     if config.get('site_title'):
         if len(page.identities) != 1:
             issues.append('expected_one_site_identity')

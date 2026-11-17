@@ -1,5 +1,9 @@
 # 全站样式与 SEO 部署
 
+## 服务端逐页标签（2026-11-16）
+
+canonical 与文章 JSON-LD 现由 Hao 原生模板片段输出，并通过 Pjax meta 标记同步。它们不在全局注入构建中；不要把含 Thymeleaf 内联表达式的模板片段粘贴到全局 head 输入框。构建、受控部署、缓存刷新、主题升级后的重新核对和回退见 [服务端部署记录](server-metadata-20261116.md)。
+
 ## 2026-11 导航与身份数据补充
 
 当前构建还包含 `navigation-accessibility.js` 和 `aerospaceboy-site-identity` JSON-LD。更新时替换原有自有 CSS/JS 块，同时更新或首次追加该身份脚本，各保留一份；保留其他注入。身份数据描述网站与公开作者，不是逐页 canonical 或文章 Schema。后台保存重开及公开原始 HTML 都须核对。实施、回退与验收范围见 [第二批优化记录](navigation-optimization-20261115.md)。

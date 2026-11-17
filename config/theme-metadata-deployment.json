@@ -1,0 +1,15 @@
+{
+  "theme": "theme-hao",
+  "theme_version": "1.7.3",
+  "halo_version": "2.27.1",
+  "installed_date": "2026-11-16",
+  "verified_date": "2026-11-17",
+  "canonical_scope": ["published posts", "single pages", "first index page"],
+  "files": {
+    "modules/head.html": "f2777298113d6dbf70a897983dea9c0a1bc96a39766a4e075dca8f4f8053713c",
+    "modules/layouts/layout.html": "b4ef25bd0ce10946aa41c90966bed54c39eb33ea8c6ae9b799abc3d5c85fe37d",
+    "modules/ab-page-metadata.html": "32c481672777fb091156184e66081d4fb970664d6e354bf3b66f8e71dc77ecdd"
+  },
+  "requires_template_cache_refresh": true,
+  "private_receipt": "backups/seo-20261116/receipt.json"
+}

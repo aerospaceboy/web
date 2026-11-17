@@ -1,0 +1,40 @@
+<!-- Owned metadata fragment; reapply with blog_tools.theme_metadata after a theme upgrade. -->
+<th:block th:fragment="metadata(htmlType)"
+          th:with="abIsPost=${htmlType == 'post' and post != null},
+                   abBase=${#strings.endsWith(site.url, '/') ? #strings.substring(site.url, 0, #strings.length(site.url)-1) : site.url},
+                   abPath=${abIsPost ? post.status.permalink : (singlePage != null ? singlePage.status.permalink : (htmlType == 'index' and posts != null and posts.page == 1 ? '/' : ''))},
+                   abUrl=${#strings.isEmpty(abPath) ? '' : (#strings.startsWith(abPath, 'https://') ? abPath : abBase + abPath)},
+                   abHeadline=${abIsPost ? post.spec.title : ''},
+                   abPublished=${abIsPost and post.spec.publishTime != null ? post.spec.publishTime.toString() : null},
+                   abModified=${abIsPost and post.status.lastModifyTime != null ? post.status.lastModifyTime.toString() : null},
+                   abAuthorName=${abIsPost and post.owner != null ? post.owner.displayName : ''},
+                   abAuthorPath=${abIsPost and post.owner != null ? post.owner.permalink : ''},
+                   abAuthorUrl=${#strings.isEmpty(abAuthorPath) ? '' : (#strings.startsWith(abAuthorPath, 'https://') ? abAuthorPath : abBase + abAuthorPath)},
+                   abCover=${abIsPost ? post.spec.cover : ''},
+                   abImage=${#strings.isEmpty(abCover) ? '' : (#strings.startsWith(abCover, '/') ? abBase + abCover : abCover)}">
+    <meta id="ab-page-metadata" name="ab-page-metadata" content="1"
+          th:attr="data-canonical=${abUrl},data-kind=${abIsPost ? 'post' : 'page'},data-headline=${abHeadline},data-published=${abPublished},data-modified=${abModified},data-author-name=${abAuthorName},data-author-url=${abAuthorUrl},data-image=${abImage}">
+    <link th:if="${not #strings.isEmpty(abUrl)}" id="ab-page-canonical" rel="canonical" th:href="${abUrl}">
+    <link th:if="${htmlType == 'index' and posts != null and posts.page == 1}"
+          id="ab-hero-preload" rel="preload" as="image" href="__AB_HERO_IMAGE__" fetchpriority="high">
+    <script th:if="${abIsPost}" id="ab-page-schema" type="application/ld+json" th:inline="javascript">
+        {
+          "@context": "https://schema.org",
+          "@type": "BlogPosting",
+          "url": /*[[${abUrl}]]*/ "",
+          "mainEntityOfPage": /*[[${abUrl}]]*/ "",
+          "headline": /*[[${abHeadline}]]*/ "",
+          "datePublished": /*[[${abPublished}]]*/ null,
+          "dateModified": /*[[${abModified}]]*/ null,
+          "author": {
+            "@type": "Person",
+            "name": /*[[${abAuthorName}]]*/ "",
+            "url": /*[[${abAuthorUrl}]]*/ ""
+          },
+          "image": /*[[${#strings.isEmpty(abImage) ? {} : {abImage}}]]*/ []
+        }
+    </script>
+    <script id="ab-page-metadata-sync">
+__AB_METADATA_SYNC__
+    </script>
+</th:block>
