@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+<title id="title">Video2AI 项目流程示意</title><desc id="desc">本地视频经过语音和视觉证据提取、时间轴融合，生成可回查的 AI 资料包。根据源码整理，并非运行截图。</desc>
+<rect width="1600" height="900" fill="#101524"/>
+<polyline points="60,0 60,900" fill="none" stroke="#192034" stroke-width="1"/>
+<polyline points="160,0 160,900" fill="none" stroke="#192034" stroke-width="1"/>
+<polyline points="260,0 260,900" fill="none" stroke="#192034" stroke-width="1"/>
+<polyline points="360,0 360,900" fill="none" stroke="#192034" stroke-width="1"/>
+<polyline points="460,0 460,900" fill="none" stroke="#192034" stroke-width="1"/>
+<polyline points="560,0 560,900" fill="none" stroke="#192034" stroke-width="1"/>
+<polyline points="660,0 660,900" fill="none" stroke="#192034" stroke-width="1"/>
+<polyline points="760,0 760,900" fill="none" stroke="#192034" stroke-width="1"/>
+<polyline points="860,0 860,900" fill="none" stroke="#192034" stroke-width="1"/>
+<polyline points="960,0 960,900" fill="none" stroke="#192034" stroke-width="1"/>
+<polyline points="1060,0 1060,900" fill="none" stroke="#192034" stroke-width="1"/>
+<polyline points="1160,0 1160,900" fill="none" stroke="#192034" stroke-width="1"/>
+<polyline points="1260,0 1260,900" fill="none" stroke="#192034" stroke-width="1"/>
+<polyline points="1360,0 1360,900" fill="none" stroke="#192034" stroke-width="1"/>
+<polyline points="1460,0 1460,900" fill="none" stroke="#192034" stroke-width="1"/>
+<polyline points="1560,0 1560,900" fill="none" stroke="#192034" stroke-width="1"/>
+<polyline points="0,60 1600,60" fill="none" stroke="#192034" stroke-width="1"/>
+<polyline points="0,160 1600,160" fill="none" stroke="#192034" stroke-width="1"/>
+<polyline points="0,260 1600,260" fill="none" stroke="#192034" stroke-width="1"/>
+<polyline points="0,360 1600,360" fill="none" stroke="#192034" stroke-width="1"/>
+<polyline points="0,460 1600,460" fill="none" stroke="#192034" stroke-width="1"/>
+<polyline points="0,560 1600,560" fill="none" stroke="#192034" stroke-width="1"/>
+<polyline points="0,660 1600,660" fill="none" stroke="#192034" stroke-width="1"/>
+<polyline points="0,760 1600,760" fill="none" stroke="#192034" stroke-width="1"/>
+<polyline points="0,860 1600,860" fill="none" stroke="#192034" stroke-width="1"/>
+<rect x="80" y="65" width="412" height="44" rx="22" fill="#202742" stroke="#4c5076" stroke-width="2"/>
+<text x="102" y="74" dominant-baseline="text-before-edge" font-family="Microsoft YaHei,sans-serif" font-size="20" font-weight="700" fill="#c3b1ee">AEROSPACEBOY  /  PROJECT 03</text>
+<text x="80" y="147" dominant-baseline="text-before-edge" font-family="Microsoft YaHei,sans-serif" font-size="84" font-weight="700" fill="#eaf0ff">Video → AI</text>
+<text x="83" y="257" dominant-baseline="text-before-edge" font-family="Microsoft YaHei,sans-serif" font-size="38" font-weight="400" fill="#c4cfe3">让视频成为可回查的证据资料包</text>
+<text x="83" y="324" dominant-baseline="text-before-edge" font-family="Microsoft YaHei,sans-serif" font-size="24" font-weight="400" fill="#90a3c2">本地处理  ·  时间戳回查  ·  Agent 接手</text>
+<rect x="80" y="435" width="460" height="269" rx="24" fill="#171f32" stroke="#35435d" stroke-width="2"/>
+<text x="110" y="463" dominant-baseline="text-before-edge" font-family="Microsoft YaHei,sans-serif" font-size="28" font-weight="700" fill="#bca5e6">01</text>
+<text x="110" y="519" dominant-baseline="text-before-edge" font-family="Microsoft YaHei,sans-serif" font-size="36" font-weight="700" fill="#eaf0ff">读取视频</text>
+<text x="110" y="588" dominant-baseline="text-before-edge" font-family="Microsoft YaHei,sans-serif" font-size="25" font-weight="400" fill="#cad4e7">单视频 / 文件夹批处理</text>
+<text x="110" y="634" dominant-baseline="text-before-edge" font-family="Microsoft YaHei,sans-serif" font-size="24" font-weight="400" fill="#94a6c2">本地媒体与音轨</text>
+<rect x="570" y="435" width="460" height="269" rx="24" fill="#171f32" stroke="#35435d" stroke-width="2"/>
+<text x="600" y="463" dominant-baseline="text-before-edge" font-family="Microsoft YaHei,sans-serif" font-size="28" font-weight="700" fill="#bca5e6">02</text>
+<text x="600" y="519" dominant-baseline="text-before-edge" font-family="Microsoft YaHei,sans-serif" font-size="36" font-weight="700" fill="#eaf0ff">提取与融合</text>
+<text x="600" y="588" dominant-baseline="text-before-edge" font-family="Microsoft YaHei,sans-serif" font-size="25" font-weight="400" fill="#cad4e7">字幕 / 关键帧 / 可选 OCR</text>
+<text x="600" y="634" dominant-baseline="text-before-edge" font-family="Microsoft YaHei,sans-serif" font-size="24" font-weight="400" fill="#94a6c2">时间轴与阶段缓存</text>
+<rect x="1060" y="435" width="460" height="269" rx="24" fill="#171f32" stroke="#35435d" stroke-width="2"/>
+<text x="1090" y="463" dominant-baseline="text-before-edge" font-family="Microsoft YaHei,sans-serif" font-size="28" font-weight="700" fill="#bca5e6">03</text>
+<text x="1090" y="519" dominant-baseline="text-before-edge" font-family="Microsoft YaHei,sans-serif" font-size="36" font-weight="700" fill="#eaf0ff">交付资料包</text>
+<text x="1090" y="588" dominant-baseline="text-before-edge" font-family="Microsoft YaHei,sans-serif" font-size="25" font-weight="400" fill="#cad4e7">离线报告 / Markdown</text>
+<text x="1090" y="634" dominant-baseline="text-before-edge" font-family="Microsoft YaHei,sans-serif" font-size="24" font-weight="400" fill="#94a6c2">联系表与精简上传包</text>
+<polyline points="546,567 564,567" fill="none" stroke="#c0a9ed" stroke-width="3"/>
+<polyline points="557,560 564,567 557,574" fill="none" stroke="#c0a9ed" stroke-width="3"/>
+<polyline points="1036,567 1054,567" fill="none" stroke="#c0a9ed" stroke-width="3"/>
+<polyline points="1047,560 1054,567 1047,574" fill="none" stroke="#c0a9ed" stroke-width="3"/>
+<text x="83" y="763" dominant-baseline="text-before-edge" font-family="Microsoft YaHei,sans-serif" font-size="25" font-weight="400" fill="#c5d3e7">可选云端 AI：字幕与屏幕文字用于总结；关键帧用于画面理解</text>
+<text x="83" y="820" dominant-baseline="text-before-edge" font-family="Microsoft YaHei,sans-serif" font-size="21" font-weight="400" fill="#90a3c2">项目流程示意 · 根据源码整理，非运行截图 / 非识别效果实测</text>
+</svg>

@@ -46,6 +46,23 @@
       "scope": "Gazebo 仿真集成与任务展示；实物能力另行验证",
       "version": "2026 比赛项目资料",
       "status": "仿真项目记录"
+    },
+    {
+      "title": "Video2AI 证据资料包",
+      "label": "Python · AI 工具",
+      "summary": "把本地视频中的讲解、画面和时间点汇成可回查的资料包，支持离线报告与 Agent 交接。",
+      "path": "/archives/video2ai-evidence-toolkit",
+      "image": "/upload/ab-video2ai-overview-v1.webp",
+      "github": "https://github.com/aerospaceboy/-AI-",
+      "tags": [
+        "Python",
+        "faster-whisper",
+        "AI Workflow"
+      ],
+      "focus": "字幕与视觉时间轴、阶段缓存、离线报告和精简上传包",
+      "scope": "64 项单元测试；本次未重跑真实视频识别",
+      "version": "2026-11-17 源码与测试整理",
+      "status": "工具项目记录"
     }
   ]
 }

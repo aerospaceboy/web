@@ -1,0 +1,39 @@
+{
+  "title": "Video2AI：让本地视频变成可回查的 AI 资料包",
+  "path": "/archives/video2ai-evidence-toolkit",
+  "post_name": "01a1e9cb-ff6f-76e4-94b8-9e1bfe252cc4",
+  "source": "content/projects/video2ai-evidence-toolkit.md",
+  "project_page": "/projects",
+  "project_page_name": "singlepage-dsvfvocd",
+  "cover": "/upload/ab-video2ai-overview-v1.webp",
+  "categories": [
+    "project-log",
+    "ai"
+  ],
+  "tags": [
+    "python",
+    "ai"
+  ],
+  "github_url": "https://github.com/aerospaceboy/-AI-",
+  "scope": "项目介绍、原创流程示意、人工构造数据的报告演示图",
+  "assets": [
+    {
+      "name": "ab-video2ai-overview-v1.webp",
+      "url": "https://aerospaceboy.site/upload/ab-video2ai-overview-v1.webp",
+      "sha256": "056b6d35f5557e233ed3d742f38f10c18a22665763bbffac067834e9fc6aaf40",
+      "bytes": 61322,
+      "width": 1600,
+      "height": 900,
+      "mime": "image/webp"
+    },
+    {
+      "name": "ab-video2ai-report-demo-v1.jpg",
+      "url": "https://aerospaceboy.site/upload/ab-video2ai-report-demo-v1.jpg",
+      "sha256": "654934237a9901a5753dba31c48c186596d8e2bf3d0910b57a16484a6bc463e4",
+      "bytes": 99623,
+      "width": 1684,
+      "height": 1006,
+      "mime": "image/jpeg"
+    }
+  ]
+}

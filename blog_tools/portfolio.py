@@ -38,7 +38,7 @@ def render_projects(items):
 <dl class="ab-project-facts"><div><dt>实现重点</dt><dd>{e['focus']}</dd></div><div><dt>验证范围</dt><dd>{e['scope']}</dd></div></dl>
 <div class="ab-project-actions"><a href="{e['path']}">项目介绍与展示图 →</a>{github}</div></div></div>''')
     return '''<h1>项目与实践</h1>
-<p class="ab-project-intro">从协议数据链到机器人作业流程，记录设计、调试与验证中的实际工作。</p>
+<p class="ab-project-intro">从通信协议、机器人到 AI 资料工具，记录设计、调试与验证中的实际工作。</p>
 <div class="ab-project-grid ab-project-index">\n''' + '\n'.join(cards) + '''\n</div>
 <div class="ab-project-directions"><h2>持续探索的方向</h2>
 <p><strong>Edge AI</strong> · Orange Pi / RK3588 上的边缘推理与视频流处理。</p>

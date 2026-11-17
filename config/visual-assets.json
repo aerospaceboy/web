@@ -5,5 +5,21 @@
     "bytes": 202612,
     "width": 1942,
     "height": 809
+  },
+  "video2ai-overview": {
+    "url": "https://aerospaceboy.site/upload/ab-video2ai-overview-v1.webp",
+    "sha256": "056b6d35f5557e233ed3d742f38f10c18a22665763bbffac067834e9fc6aaf40",
+    "bytes": 61322,
+    "width": 1600,
+    "height": 900,
+    "mime": "image/webp"
+  },
+  "video2ai-report-demo": {
+    "url": "https://aerospaceboy.site/upload/ab-video2ai-report-demo-v1.jpg",
+    "sha256": "654934237a9901a5753dba31c48c186596d8e2bf3d0910b57a16484a6bc463e4",
+    "bytes": 99623,
+    "width": 1684,
+    "height": 1006,
+    "mime": "image/jpeg"
   }
 }
