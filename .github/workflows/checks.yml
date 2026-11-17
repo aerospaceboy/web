@@ -33,3 +33,5 @@ jobs:
       - run: node --check customization/resume-enhancement.js
       - run: node --check customization/site-hub.js
       - run: node --check customization/motion-effects.js
+      - run: node --check customization/pid-lab.js
+      - run: node --test tests/article-tools.test.cjs tests/pid-lab.test.cjs

@@ -38,7 +38,7 @@ def navigation_source(config):
     settings["featuredProjects"] = validate_projects(config.get("featured_projects", []))
     prefix = "window.__abPublicConfig = " + json.dumps(settings, ensure_ascii=True).replace("<", "\\u003c") + ";\n"
     source = prefix + "\n".join((ROOT / "customization" / name).read_text(encoding="utf-8")
-                               for name in ("mobile-navigation.js", "header-layout.js", "space-effects.js", "pointer-effects.js", "resume-enhancement.js", "site-hub.js", "motion-effects.js", "portfolio.js", "navigation-accessibility.js", "article-tools.js"))
+                               for name in ("mobile-navigation.js", "header-layout.js", "space-effects.js", "pointer-effects.js", "resume-enhancement.js", "site-hub.js", "motion-effects.js", "portfolio.js", "navigation-accessibility.js", "article-tools.js", "pid-lab.js"))
     validate_injected_text(source)
     return source
 

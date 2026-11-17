@@ -76,6 +76,8 @@ canonical 与文章 JSON-LD 现由 Hao 原生模板片段输出，并通过 Pjax
 
 恢复保存前的全局 head、Banner HTML、站点描述与关于页摘要，再重新执行公网检查。完整站点恢复步骤见 `recovery.md`。
 
+2026-11-17 文章内 PID 实验：全局组合脚本包含 `pid-lab.js`，与统一 CSS 一起构建并替换两个自有块；不要覆盖其他注入。上线后验证对应文章参数操作及 PJAX 重入，运行 `node --test tests/article-tools.test.cjs tests/pid-lab.test.cjs`。实际哈希、私有备份和模型验证见 [部署记录](pid-lab-20261117.md)。
+
 ## 官方依据
 
 - [Halo 代码注入和 SEO 设置](https://docs.halo.run/guide/use/settings)：全局 head 作用于所有页面，SEO 站点描述作用于首页。
